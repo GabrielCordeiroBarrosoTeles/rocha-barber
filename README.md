@@ -77,7 +77,7 @@ git init
 git add .
 git commit -m "Primeiro commit"
 git branch -M main
-git remote add origin https://github.com/seu-usuario/rocha-barber.git
+git remote add origin https://github.com/GabrielCordeiroBarrosoTeles/rocha-barber.git
 git push -u origin main
 ```
 
@@ -96,7 +96,7 @@ Isso irá construir o projeto e publicá-lo na branch gh-pages do seu repositór
 3. Selecione a branch "gh-pages" como fonte
 4. Clique em "Save"
 
-Seu site estará disponível em `https://seu-usuario.github.io/rocha-barber/`
+Seu site estará disponível em `https://GabrielCordeiroBarrosoTeles.github.io/rocha-barber/`
 
 ## 🧩 Estrutura do Projeto
 
@@ -124,7 +124,7 @@ Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes
 
 ## 👨‍💻 Autor
 
-Desenvolvido por [Seu Nome](https://github.com/seu-usuario)
+Desenvolvido por [Gabriel Cordeiro](https://github.com/GabrielCordeiroBarrosoTeles)
 
 ---
 
