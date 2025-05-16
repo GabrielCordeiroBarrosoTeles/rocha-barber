@@ -96,7 +96,7 @@ Isso irá construir o projeto e publicá-lo na branch gh-pages do seu repositór
 3. Selecione a branch "gh-pages" como fonte
 4. Clique em "Save"
 
-Seu site estará disponível em `https://seu-usuario.github.io/rocha-barber/`
+Seu site estará disponível em `https://GabrielCordeiroBarrosoTeles.github.io/rocha-barber/`
 
 ## 🧩 Estrutura do Projeto
 
