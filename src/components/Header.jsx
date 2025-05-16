@@ -6,7 +6,7 @@ import { Button } from "./ui/button"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const whatsappNumber = "5585996988973"
+  const whatsappNumber = "558596988973"
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -51,7 +51,7 @@ export default function Header() {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
             </a>
             <a
-              href={`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=Olá! Gostaria de agendar um horário na Rocha Barber.`}
+              href={`https://wa.me/${whatsappNumber}`}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -78,7 +78,7 @@ export default function Header() {
               Contato
             </a>
             <a
-              href={`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=Olá! Gostaria de agendar um horário na Rocha Barber.`}
+              href={`https://wa.me/${whatsappNumber}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full"

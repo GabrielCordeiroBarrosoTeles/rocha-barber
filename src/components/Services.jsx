@@ -1,7 +1,7 @@
 import ServiceCard from "./ServiceCard"
 
 export default function Services() {
-  const whatsappNumber = "5585996988973"
+  const whatsappNumber = "558596988973"
 
   return (
     <section id="servicos" className="w-full py-16 bg-gradient-to-b from-white to-zinc-100">

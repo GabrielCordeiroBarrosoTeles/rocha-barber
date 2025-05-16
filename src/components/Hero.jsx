@@ -1,7 +1,7 @@
 import { Button } from "./ui/button"
 
 export default function Hero() {
-  const whatsappNumber = "5585996988973"
+  const whatsappNumber = "558596988973"
 
   return (
     <section id="inicio" className="w-full bg-zinc-900 text-white relative overflow-hidden">
@@ -31,7 +31,7 @@ export default function Hero() {
         </p>
         <div className="mt-8 space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
           <a
-            href={`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=Olá! Gostaria de agendar um horário na Rocha Barber.`}
+            href={`https://wa.me/${whatsappNumber}`}
             target="_blank"
             rel="noopener noreferrer"
             className="block sm:inline-block transform hover:scale-105 transition-transform duration-300"

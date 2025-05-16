@@ -1,7 +1,7 @@
 import { Button } from "./ui/button"
 
 export default function CTA() {
-  const whatsappNumber = "5585996988973"
+  const whatsappNumber = "558596988973"
 
   return (
     <section className="w-full py-16 bg-gradient-to-r from-amber-600 to-amber-700 text-white">
@@ -11,7 +11,7 @@ export default function CTA() {
           Agende agora mesmo seu horário e experimente o melhor serviço de barbearia da cidade.
         </p>
         <a
-          href={`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=Olá! Gostaria de agendar um horário na Rocha Barber.`}
+          href={`https://wa.me/${whatsappNumber}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block transform hover:scale-105 transition-transform duration-300"

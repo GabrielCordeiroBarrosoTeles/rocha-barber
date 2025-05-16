@@ -10,5 +10,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: "/rocha-barber/", // Configuração para GitHub Pages
+  // Removendo o base path para funcionar corretamente na Vercel
 })

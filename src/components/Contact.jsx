@@ -2,7 +2,7 @@ import { Calendar, MapPin, Phone } from "./icons"
 import { Button } from "./ui/button"
 
 export default function Contact() {
-  const whatsappNumber = "5585996988973"
+  const whatsappNumber = "558596988973"
 
   return (
     <section id="contato" className="w-full py-16 bg-zinc-900 text-white">
@@ -41,7 +41,7 @@ export default function Contact() {
               </div>
               <div className="mt-8">
                 <a
-                  href={`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=Olá! Gostaria de mais informações sobre a Rocha Barber.`}
+                  href={`https://wa.me/${whatsappNumber}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center"

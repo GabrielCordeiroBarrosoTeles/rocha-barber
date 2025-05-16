@@ -14,13 +14,13 @@ export default function ServiceCard({
 }) {
   const handleSchedule = () => {
     const message = `Olá! Gostaria de agendar um ${title} por ${price}.`
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(message)}`
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, "_blank")
   }
 
   return (
     <div
-      className={`overflow-hidden rounded-lg shadow-lg h-full flex flex-col transition-shadow duration-300 hover:shadow-2xl ${
+      className={`overflow-hidden rounded-lg shadow-lg h-full flex flex-col ${
         featured 
           ? "border-2 border-amber-600 bg-gradient-to-br from-zinc-50 to-amber-50" 
           : "border border-zinc-200 hover:border-amber-600 bg-white"
@@ -56,26 +56,26 @@ export default function ServiceCard({
                 <svg className="h-5 w-5 text-amber-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-zinc-800" style={{ color: 'black' }}>{benefit}</span>
+                <span className="text-zinc-800">{benefit}</span>
               </li>
             ))}
           </ul>
         )}
+        
+        {/* Versículo bíblico ou mensagem inspiradora */}
+        <div className="mt-4 pt-4 border-t border-zinc-200">
+          <p className="text-xs text-center text-zinc-500 italic">
+            {featured ? 
+              '"Tudo posso naquele que me fortalece." - Filipenses 4:13' : 
+              '"Porque o Senhor dá a sabedoria." - Provérbios 2:6'}
+          </p>
+        </div>
       </div>
       
-      {/* Versículo bíblico coladinho com o botão */}
-      <div className="px-5 border-t border-zinc-200">
-        <p className="text-xs text-center text-zinc-500 italic py-2">
-          {featured 
-            ? '"Tudo posso naquele que me fortalece." - Filipenses 4:13' 
-            : '"Porque o Senhor dá a sabedoria." - Provérbios 2:6'}
-        </p>
-      </div>
-
-      <div className="px-5 pb-5">
+      <div className="p-5 mt-auto">
         <Button 
           variant={featured ? "gradient" : "primary"} 
-          className="w-full py-3 text-lg"
+          className={`w-full ${featured ? "py-3 text-lg" : ""}`} 
           onClick={handleSchedule}
         >
           Agendar Agora
