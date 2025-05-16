@@ -22,7 +22,7 @@ export default function Services() {
               price="R$ 25,00"
               imageSrc="./images/corte.png"
               whatsappNumber={whatsappNumber}
-              additionalInfo="Inclui lavagem, corte e finalização com produtos de qualidade. Atendimento personalizado para valorizar seu estilo."
+              additionalInfo="Inclui corte e finalização com produtos de qualidade. Atendimento personalizado para valorizar seu estilo."
               benefits={[
                 "Profissionais experientes",
                 "Ambiente climatizado",
@@ -38,7 +38,7 @@ export default function Services() {
               price="R$ 15,00"
               imageSrc="./images/barba.png"
               whatsappNumber={whatsappNumber}
-              additionalInfo="Modelagem completa com toalha quente, óleo essencial e finalização com balm para barba."
+              additionalInfo="Modelagem completa com óleo essencial e finalização com balm para barba."
               benefits={[
                 "Navalha profissional",
                 "Hidratação completa",
