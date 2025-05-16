@@ -16,7 +16,7 @@ Este é um site institucional responsivo para a barbearia Rocha Barber, desenvol
 ### Passo 1: Clonar o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/rocha-barber.git
+git clone https://github.com/GabrielCordeiroBarrosoTeles/rocha-barber.git
 cd rocha-barber
 ```
 
@@ -55,17 +55,48 @@ O site estará disponível em `http://localhost:5173`.
 ### Método Automático (Recomendado)
 
 1. Faça um fork deste repositório ou crie um novo repositório no GitHub
-2. Importe o repositório na Vercel (https://vercel.com/import)
-3. A Vercel detectará automaticamente que é um projeto React + Vite
-4. Clique em "Deploy" e aguarde a conclusão do processo
+2. Clone o repositório para sua máquina local
+3. Faça suas alterações
+4. Commit e push para o repositório remoto
+5. O GitHub Actions automaticamente fará o deploy para o GitHub Pages
 
-O site estará disponível em `https://rocha-barber.vercel.app` ou em um domínio personalizado que você configurar.
+### Método Manual
 
-### Configurações Importantes para Vercel
+#### Passo 1: Configurar o arquivo vite.config.js
 
-- Certifique-se de que o arquivo `vite.config.js` **não** tenha a configuração `base` definida
-- Verifique se todos os caminhos de imagens e recursos estão usando caminhos relativos (começando com `./`)
-- Se encontrar problemas com tela branca, verifique os logs de build na Vercel para identificar possíveis erros
+O arquivo já está configurado com `base: "/rocha-barber/"` para funcionar com GitHub Pages.
+
+#### Passo 2: Criar um repositório no GitHub
+
+Crie um novo repositório no GitHub com o nome "rocha-barber".
+
+#### Passo 3: Inicializar Git e fazer o primeiro commit
+
+```bash
+git init
+git add .
+git commit -m "Primeiro commit"
+git branch -M main
+git remote add origin https://github.com/seu-usuario/rocha-barber.git
+git push -u origin main
+```
+
+#### Passo 4: Deploy para GitHub Pages
+
+```bash
+npm run deploy
+```
+
+Isso irá construir o projeto e publicá-lo na branch gh-pages do seu repositório.
+
+#### Passo 5: Configurar GitHub Pages
+
+1. Vá para as configurações do seu repositório no GitHub
+2. Navegue até a seção "Pages"
+3. Selecione a branch "gh-pages" como fonte
+4. Clique em "Save"
+
+Seu site estará disponível em `https://seu-usuario.github.io/rocha-barber/`
 
 ## 🧩 Estrutura do Projeto
 
