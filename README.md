@@ -2,6 +2,10 @@
 
 ![Rocha Barber Logo](./public/images/logo.png)
 
+<!-- Header Image -->
+
+![Header](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/header.png)
+
 ## 📋 Visão Geral
 
 Este é um site institucional responsivo para a barbearia Rocha Barber, desenvolvido com React e Vite. O site segue o conceito de Mobile First, garantindo uma experiência otimizada em dispositivos móveis e desktops.
@@ -10,8 +14,8 @@ Este é um site institucional responsivo para a barbearia Rocha Barber, desenvol
 
 ### Pré-requisitos
 
-- Node.js 18.17.0 ou superior
-- npm ou yarn
+* Node.js 18.17.0 ou superior
+* npm ou yarn
 
 ### Passo 1: Clonar o repositório
 
@@ -36,19 +40,41 @@ O site estará disponível em `http://localhost:5173`.
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **React**: Biblioteca JavaScript para construção de interfaces
-- **Vite**: Build tool e servidor de desenvolvimento
-- **Tailwind CSS**: Framework CSS para design responsivo
-- **React Icons**: Biblioteca de ícones para React
+* **React**: Biblioteca JavaScript para construção de interfaces
+* **Vite**: Build tool e servidor de desenvolvimento
+* **Tailwind CSS**: Framework CSS para design responsivo
+* **React Icons**: Biblioteca de ícones para React
 
 ## 📱 Recursos e Funcionalidades
 
-- **Design Responsivo**: Adaptação perfeita para todos os tamanhos de tela
-- **Seção de Serviços**: Apresentação dos serviços oferecidos pela barbearia
-- **Galeria de Fotos**: Mostra do ambiente e trabalhos realizados
-- **Formulário de Contato**: Facilidade para clientes entrarem em contato
-- **Depoimentos**: Feedback de clientes satisfeitos
-- **Informações de Localização**: Endereço e mapa para fácil localização
+### Seção de Serviços
+
+<!-- Card Services Image -->
+
+![Serviços](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/cardServices.png)
+
+* **Design Responsivo**: Adaptação perfeita para todos os tamanhos de tela
+* **Seção de Serviços**: Apresentação dos serviços oferecidos pela barbearia
+* **Galeria de Fotos**: Mostra do ambiente e trabalhos realizados
+* **Formulário de Contato**: Facilidade para clientes entrarem em contato
+* **Depoimentos**: Feedback de clientes satisfeitos
+* **Informações de Localização**: Endereço e mapa para fácil localização
+
+### Sobre Mim
+
+<!-- About Me Image -->
+
+![Sobre Mim](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/aboutMe.png)
+
+Aqui você encontra nossa história, missão e valores.
+
+### Depoimentos
+
+<!-- Feedback Image -->
+
+![Depoimentos](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/feedback.png)
+
+Nossos clientes satisfeitos compartilham suas experiências.
 
 ## 📤 Deploy na Vercel
 
@@ -104,6 +130,11 @@ Seu site estará disponível em `https://GabrielCordeiroBarrosoTeles.github.io/r
 rocha-barber/
 ├── public/
 │   └── images/         # Imagens estáticas
+│       └── header.png
+│       └── cardServices.png
+│       └── aboutMe.png
+│       └── feedback.png
+│       └── footer.png
 ├── src/
 │   ├── components/     # Componentes React
 │   │   ├── ui/         # Componentes de UI reutilizáveis
@@ -117,6 +148,10 @@ rocha-barber/
 ├── vite.config.js      # Configuração do Vite
 └── README.md           # Documentação
 ```
+
+<!-- Footer Image -->
+
+![Footer](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/footer.png)
 
 ## 📝 Licença
 
