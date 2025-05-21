@@ -1,29 +1,25 @@
 import TestimonialCard from "./TestimonialCard"
 
 export default function Testimonials() {
-  const testimonials = [
-    {
-      name: "João Silva",
-      role: "Cliente desde 2020",
-      content:
-        "Excelente atendimento e ambiente muito agradável. O corte ficou perfeito e o barbeiro deu ótimas dicas de como manter o visual. Recomendo a todos!",
-      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-    },
-    {
-      name: "Pedro Oliveira",
-      role: "Cliente desde 2021",
-      content:
-        "Ambiente familiar e acolhedor. Além do profissionalismo, o que me faz voltar sempre é o respeito e os valores cristãos que encontro aqui.",
-      avatar: "https://randomuser.me/api/portraits/men/2.jpg",
-    },
-    {
-      name: "Carlos Mendes",
-      role: "Cliente desde 2022",
-      content:
-        "Atendimento de primeira qualidade! O plano mensal vale muito a pena para quem, como eu, gosta de manter o visual sempre impecável.",
-      avatar: "https://randomuser.me/api/portraits/men/3.jpg",
-    },
-  ]
+const testimonials = [
+  {
+    name: "Hudson",
+    content: "A barbearia do lugar é um lugar de paz, onde assim que você pisa, sabe que está sendo muito bem-vindo. Fora o ambiente climatizado, tenho certeza de que quem for não vai se arrepender. Além disso, o Lucas é um excelente barbeiro, uma pessoa de coração puro, que trata muito bem seus clientes — e ainda te deixa bonito.",
+    avatar: "/images/userWhite.svg",
+  },
+  {
+    name: "Adriel Maia",
+    content: "Começando pelo atendimento excelente, muito atencioso às exigências do cliente, no conforto de um ambiente climatizado, equipado e preparado para atender às nossas expectativas.",
+    avatar: "/images/userWhite.svg",
+  },
+  {
+    name: "Gabriel Cordeiro",
+    content: "Lugar top demais! Sempre que vou sou bem recebido, o ambiente é massa, bem cuidado, climatizado, dá até vontade de ficar lá trocando ideia. E o Lucas é brabo no que faz, além de ser gente boa demais!",
+    avatar: "/images/userWhite.svg",
+  },
+];
+
+
 
   return (
     <section className="w-full py-16 bg-zinc-900 text-white">

@@ -11,7 +11,8 @@ export default function Hero() {
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="./images/barbershop.png" 
+          //src="./images/barbershop.png"
+          src="https://i.pinimg.com/736x/09/64/58/096458c2b6e3d338fbbd6a4bd6dd3cfb.jpg"   
           alt="Barbershop Background" 
           className="w-full h-full object-cover opacity-40"
         />

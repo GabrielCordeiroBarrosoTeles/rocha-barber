@@ -1,4 +1,4 @@
-export default function TestimonialCard({ name, role, content, avatar }) {
+export default function TestimonialCard({ name, content, avatar }) {
   return (
     <div className="bg-zinc-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 h-full flex flex-col border border-zinc-700">
       <div className="flex items-center mb-4">
@@ -7,7 +7,6 @@ export default function TestimonialCard({ name, role, content, avatar }) {
         </div>
         <div>
           <h3 className="font-bold text-white">{name}</h3>
-          <p className="text-amber-400 text-sm">{role}</p>
         </div>
       </div>
       

@@ -20,7 +20,8 @@ export default function Services() {
               title="Corte de Cabelo"
               description="Estilo personalizado para você"
               price="R$ 25,00"
-              imageSrc="./images/corte.png"
+              //imageSrc="./images/corte.png"
+              imageSrc="https://apolobarbearia.com.br/wp-content/uploads/2022/12/Foto-1-1-1024x683.jpg"
               whatsappNumber={whatsappNumber}
               additionalInfo="Inclui corte e finalização com produtos de qualidade. Atendimento personalizado para valorizar seu estilo."
               benefits={[
@@ -36,7 +37,8 @@ export default function Services() {
               title="Barba"
               description="Acabamento perfeito"
               price="R$ 15,00"
-              imageSrc="./images/barba.png"
+              //imageSrc="./images/barba.png"
+              imageSrc="https://i.pinimg.com/736x/1e/ff/35/1eff3521dc4833bcaabbcb7faee1468e.jpg"
               whatsappNumber={whatsappNumber}
               additionalInfo="Modelagem completa com óleo essencial e finalização com balm para barba."
               benefits={[
@@ -56,7 +58,8 @@ export default function Services() {
                 title="Plano Mensal"
                 description="Nosso melhor custo-benefício"
                 price="R$ 100,00"
-                imageSrc="./images/plano.png"
+                //imageSrc="./images/plano.png"
+                imageSrc="https://st2.depositphotos.com/2931363/9695/i/450/depositphotos_96952024-stock-photo-young-handsome-man-in-barbershop.jpg"
                 featured={true}
                 additionalInfo="Assinatura mensal com serviços ilimitados para você estar sempre impecável."
                 benefits={[
