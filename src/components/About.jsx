@@ -1,13 +1,18 @@
 export default function About() {
   return (
-    <section id="sobre" className="w-full py-16 bg-zinc-100">
+    <section id="sobre" className="w-full py-20 bg-zinc-100">
       <div className="container px-4 mx-auto">
-        <div className="flex flex-col md:flex-row items-center gap-8">
-          <div className="w-full md:w-1/2 aspect-video relative rounded-lg overflow-hidden shadow-xl transform hover:scale-[1.02] transition-all duration-500">
-            <img src="./images/barbershop.png" alt="Barbearia Rocha" className="object-cover w-full h-full" />
+        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-8">
+          <div className="w-full md:w-1/2 relative rounded-lg overflow-hidden shadow-xl transform hover:scale-[1.02] transition-all duration-500" style={{ aspectRatio: '4/3', maxHeight: 500 }}>
+            <img
+              src="./images/barbershop.jpg"
+              alt="Barbearia Rocha"
+              className="object-cover w-full h-full"
+              style={{ objectPosition: 'center 40%' }}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
               <div className="p-4 text-white">
-                <p className="font-semibold italic">"Servindo com excelência desde 2020"</p>
+                <p className="font-semibold italic">"Servindo com excelência desde 2022"</p>
               </div>
             </div>
           </div>
@@ -32,11 +37,10 @@ export default function About() {
               </p>
               <p className="text-right text-sm text-amber-700 mt-2">— Lucas Leonidas, Fundador da Rocha Barber</p>
             </div>
-
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-16">
           <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
             <div className="w-12 h-12 bg-amber-600 rounded-full flex items-center justify-center mb-4 text-white">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
