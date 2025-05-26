@@ -1,8 +1,6 @@
 import ServiceCard from "./ServiceCard"
 
 export default function Services() {
-  const whatsappNumber = "558596988973"
-
   return (
     <section id="servicos" className="w-full py-16 bg-gradient-to-b from-white to-zinc-100">
       <div className="container px-4 mx-auto">
@@ -14,15 +12,13 @@ export default function Services() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="transform hover:scale-105 transition-all duration-300">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="service-card-container">
             <ServiceCard
               title="Corte de Cabelo"
               description="Estilo personalizado para você"
               price="R$ 25,00"
-              //imageSrc="./images/corte.png"
               imageSrc="https://apolobarbearia.com.br/wp-content/uploads/2022/12/Foto-1-1-1024x683.jpg"
-              whatsappNumber={whatsappNumber}
               additionalInfo="Inclui corte e finalização com produtos de qualidade. Atendimento personalizado para valorizar seu estilo."
               benefits={[
                 "Profissionais experientes",
@@ -32,14 +28,12 @@ export default function Services() {
             />
           </div>
 
-          <div className="transform hover:scale-105 transition-all duration-300">
+          <div className="service-card-container">
             <ServiceCard
               title="Barba"
               description="Acabamento perfeito"
               price="R$ 15,00"
-              //imageSrc="./images/barba.png"
               imageSrc="https://i.pinimg.com/736x/1e/ff/35/1eff3521dc4833bcaabbcb7faee1468e.jpg"
-              whatsappNumber={whatsappNumber}
               additionalInfo="Modelagem completa com óleo essencial e finalização com balm para barba."
               benefits={[
                 "Navalha profissional",
@@ -49,7 +43,7 @@ export default function Services() {
             />
           </div>
 
-          <div className="featured-card animate-pulse-slow transform hover:scale-105 transition-all duration-300 lg:translate-y-[-20px]">
+          <div className="service-card-container">
             <div className="relative">
               <div className="absolute -top-4 left-0 right-0 mx-auto w-max bg-gradient-to-r from-amber-600 to-amber-800 text-white px-4 py-1 rounded-full font-bold shadow-lg z-10">
                 MELHOR OPÇÃO
@@ -58,7 +52,6 @@ export default function Services() {
                 title="Plano Mensal"
                 description="Nosso melhor custo-benefício"
                 price="R$ 100,00"
-                //imageSrc="./images/plano.png"
                 imageSrc="https://st2.depositphotos.com/2931363/9695/i/450/depositphotos_96952024-stock-photo-young-handsome-man-in-barbershop.jpg"
                 featured={true}
                 additionalInfo="Assinatura mensal com serviços ilimitados para você estar sempre impecável."
@@ -69,7 +62,6 @@ export default function Services() {
                   "Atendimento prioritário",
                   "Produtos exclusivos"
                 ]}
-                whatsappNumber={whatsappNumber}
               />
             </div>
           </div>

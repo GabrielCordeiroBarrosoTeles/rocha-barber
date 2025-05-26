@@ -1,3 +1,4 @@
+// Removida importação do Router que não é mais necessária neste componente
 import Header from "./components/Header"
 import Hero from "./components/Hero"
 import Services from "./components/Services"
@@ -7,6 +8,7 @@ import Testimonials from "./components/Testimonials"
 import CTA from "./components/CTA"
 import Contact from "./components/Contact"
 import Footer from "./components/Footer"
+import FAQ from "./components/FAQ"
 
 export default function App() {
   return (
@@ -18,6 +20,7 @@ export default function App() {
         <Services />
         <About />
         <Testimonials />
+        <FAQ />
         <CTA />
         <Contact />
       </main>

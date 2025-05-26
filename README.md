@@ -1,166 +1,148 @@
-# Rocha Barber - Site Institucional
+# Rocha Barber - Sistema de Agendamentos
 
-![Rocha Barber Logo](./public/images/logo.png)
+Sistema completo de agendamentos para barbearia com gerenciamento de planos mensais, configuração de dias e horários de funcionamento, e painel administrativo.
 
-<!-- Header Image -->
+## Visão Geral
 
-![Header](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/header.png)
+Este sistema foi desenvolvido para gerenciar agendamentos de uma barbearia, incluindo funcionalidades para:
+- Agendamento de serviços online
+- Gerenciamento de planos mensais
+- Configuração de dias e horários de funcionamento
+- Painel administrativo
+- Design responsivo com foco em mobile-first
 
-## 📋 Visão Geral
+## Funcionalidades Principais
 
-Este é um site institucional responsivo para a barbearia Rocha Barber, desenvolvido com React e Vite. O site segue o conceito de Mobile First, garantindo uma experiência otimizada em dispositivos móveis e desktops.
+### Agendamento de Serviços
+- Seleção de serviço
+- Escolha de data e horário disponíveis
+- Verificação automática de disponibilidade
+- Suporte a planos mensais e agendamentos avulsos
+- Interface amigável e responsiva
 
-## 🚀 Instalação e Execução
+### Planos Mensais
+- Plano mensal com direito a 4 cortes por mês
+- Renovação automática mensal
+- Histórico de uso por até 12 meses
+- Visualização de cortes disponíveis/utilizados
+- **Importante**: Para usar o plano mensal, o cliente deve digitar seu nome EXATAMENTE da mesma forma em todos os agendamentos
 
-### Pré-requisitos
+### Painel Administrativo
+- Visualização e gerenciamento de agendamentos
+- Configuração de dias e horários de funcionamento
+- Monitoramento de clientes com plano mensal
+- Exportação e importação de dados
+- Autenticação segura
 
-* Node.js 18.17.0 ou superior
-* npm ou yarn
+## Estrutura de Armazenamento de Dados
 
-### Passo 1: Clonar o repositório
+### localStorage (Principal)
+No navegador, os dados são armazenados no localStorage para acesso rápido:
+- `appointments`: Lista de todos os agendamentos
+- `clientPlans`: Informações sobre os planos dos clientes
+- `workingDays`: Configuração dos dias de funcionamento
+- `timeSlots`: Horários disponíveis para agendamento
+
+### IndexedDB (Backup)
+Para persistência de longo prazo, os dados são armazenados no IndexedDB:
+- Banco de dados: `barberShopDB`
+- Store: `data`
+- Chaves: `appointments`, `clientPlans`, `workingDays`, `timeSlots`
+
+## Tecnologias Utilizadas
+
+- **Frontend**: React, Vite, TailwindCSS
+- **Armazenamento**: localStorage, IndexedDB
+- **Implantação**: Vercel
+
+## Melhorias Implementadas
+
+1. **Verificação de Dias de Funcionamento**
+   - Verificação precisa dos dias disponíveis para agendamento
+   - Configuração de dias de funcionamento pelo administrador
+   - Feedback claro sobre dias não disponíveis
+
+2. **Organização de Agendamentos**
+   - Ordenação por data e horário
+   - Exibição de horários disponíveis em ordem crescente
+   - Interface intuitiva para seleção de horários
+
+3. **Modal de Confirmação para Exclusão**
+   - Design moderno com gradientes e animações
+   - Informações detalhadas sobre o agendamento a ser excluído
+   - Confirmação para evitar exclusões acidentais
+
+4. **Planos Mensais Inteligentes**
+   - Renovação automática mensal
+   - Restauração de agendamentos cancelados ao plano
+   - Histórico detalhado de uso
+
+5. **Design Mobile-First**
+   - Interface otimizada para dispositivos móveis
+   - Experiência de usuário consistente em todos os dispositivos
+   - Elementos visuais modernos e responsivos
+
+6. **FAQ Integrado**
+   - Seção de perguntas frequentes na página inicial
+   - Informações claras sobre funcionamento do sistema
+   - Instruções sobre uso do plano mensal
+
+## Implantação no Vercel
+
+Este projeto está configurado para ser implantado no Vercel. Para implantar:
+
+1. Faça o fork deste repositório para sua conta GitHub
+2. Conecte o repositório ao Vercel
+3. O arquivo `vercel.json` já está configurado para:
+   - Usar o framework Vite
+   - Definir o comando de build como `npm run build`
+   - Configurar as rotas para SPA (Single Page Application)
+   - Definir o diretório de saída como `dist`
+
+4. Após a implantação, o sistema estará disponível no domínio fornecido pelo Vercel
+
+## Desenvolvimento Local
 
 ```bash
-git clone https://github.com/GabrielCordeiroBarrosoTeles/rocha-barber.git
-cd rocha-barber
-```
-
-### Passo 2: Instalar dependências
-
-```bash
+# Instalar dependências
 npm install
-```
 
-### Passo 3: Executar o projeto em ambiente de desenvolvimento
-
-```bash
+# Iniciar servidor de desenvolvimento
 npm run dev
+
+# Construir para produção
+npm run build
+
+# Visualizar build de produção
+npm run preview
 ```
 
-O site estará disponível em `http://localhost:5173`.
+## Acesso ao Painel Administrativo
 
-## 🛠️ Tecnologias Utilizadas
+- URL: `/admin`
+- Usuário: `admin`
+- Senha: `barber2024`
 
-* **React**: Biblioteca JavaScript para construção de interfaces
-* **Vite**: Build tool e servidor de desenvolvimento
-* **Tailwind CSS**: Framework CSS para design responsivo
-* **React Icons**: Biblioteca de ícones para React
+## Perguntas Frequentes
 
-## 📱 Recursos e Funcionalidades
+### Como funciona o agendamento?
+Para agendar, basta clicar no botão "Agende seu horário" e preencher o formulário com seu nome, escolher a data e horário disponíveis. Você receberá uma confirmação após concluir o agendamento.
 
-### Seção de Serviços
+### O que é o plano mensal?
+O plano mensal dá direito a 4 cortes por mês por R$ 120,00. É ideal para quem deseja manter o visual sempre em dia com economia. Importante: ao usar o plano mensal, digite seu nome EXATAMENTE da mesma forma em todos os agendamentos para que o sistema reconheça seu plano.
 
-<!-- Card Services Image -->
+### Os planos mensais são apagados quando passa o mês?
+Não, os planos mensais são renovados automaticamente a cada mês. O histórico do mês anterior é preservado e os cortes disponíveis são resetados para o valor máximo (4 cortes). O histórico de uso é mantido por até 12 meses.
 
-![Serviços](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/cardServices.png)
+### Posso cancelar ou remarcar meu agendamento?
+Sim, para cancelar ou remarcar, entre em contato conosco pelo WhatsApp com pelo menos 2 horas de antecedência. Para clientes com plano mensal, o agendamento cancelado será devolvido ao seu saldo de cortes disponíveis.
 
-* **Design Responsivo**: Adaptação perfeita para todos os tamanhos de tela
-* **Seção de Serviços**: Apresentação dos serviços oferecidos pela barbearia
-* **Galeria de Fotos**: Mostra do ambiente e trabalhos realizados
-* **Formulário de Contato**: Facilidade para clientes entrarem em contato
-* **Depoimentos**: Feedback de clientes satisfeitos
-* **Informações de Localização**: Endereço e mapa para fácil localização
+### Quais são os dias e horários de funcionamento?
+Estamos abertos de segunda a sexta-feira, das 8h às 18h. Não abrimos aos sábados e domingos. Os horários disponíveis para agendamento são exibidos no momento da reserva.
 
-### Sobre Mim
+## Considerações de Segurança
 
-<!-- About Me Image -->
-
-![Sobre Mim](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/aboutMe.png)
-
-Aqui você encontra nossa história, missão e valores.
-
-### Depoimentos
-
-<!-- Feedback Image -->
-
-![Depoimentos](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/feedback.png)
-
-Nossos clientes satisfeitos compartilham suas experiências.
-
-## 📤 Deploy na Vercel
-
-### Método Automático (Recomendado)
-
-1. Faça um fork deste repositório ou crie um novo repositório no GitHub
-2. Clone o repositório para sua máquina local
-3. Faça suas alterações
-4. Commit e push para o repositório remoto
-5. O GitHub Actions automaticamente fará o deploy para o GitHub Pages
-
-### Método Manual
-
-#### Passo 1: Configurar o arquivo vite.config.js
-
-O arquivo já está configurado com `base: "/rocha-barber/"` para funcionar com GitHub Pages.
-
-#### Passo 2: Criar um repositório no GitHub
-
-Crie um novo repositório no GitHub com o nome "rocha-barber".
-
-#### Passo 3: Inicializar Git e fazer o primeiro commit
-
-```bash
-git init
-git add .
-git commit -m "Primeiro commit"
-git branch -M main
-git remote add origin https://github.com/GabrielCordeiroBarrosoTeles/rocha-barber.git
-git push -u origin main
-```
-
-#### Passo 4: Deploy para GitHub Pages
-
-```bash
-npm run deploy
-```
-
-Isso irá construir o projeto e publicá-lo na branch gh-pages do seu repositório.
-
-#### Passo 5: Configurar GitHub Pages
-
-1. Vá para as configurações do seu repositório no GitHub
-2. Navegue até a seção "Pages"
-3. Selecione a branch "gh-pages" como fonte
-4. Clique em "Save"
-
-Seu site estará disponível em `https://GabrielCordeiroBarrosoTeles.github.io/rocha-barber/`
-
-## 🧩 Estrutura do Projeto
-
-```
-rocha-barber/
-├── public/
-│   └── images/         # Imagens estáticas
-│       └── header.png
-│       └── cardServices.png
-│       └── aboutMe.png
-│       └── feedback.png
-│       └── footer.png
-├── src/
-│   ├── components/     # Componentes React
-│   │   ├── ui/         # Componentes de UI reutilizáveis
-│   │   └── ...         # Outros componentes específicos
-│   ├── lib/            # Funções utilitárias
-│   ├── App.jsx         # Componente principal
-│   ├── index.css       # Estilos globais
-│   └── main.jsx        # Ponto de entrada
-├── index.html          # Template HTML
-├── package.json        # Dependências e scripts
-├── vite.config.js      # Configuração do Vite
-└── README.md           # Documentação
-```
-
-<!-- Footer Image -->
-
-![Footer](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/footer.png)
-
-## 📝 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## 👨‍💻 Autor
-
-Desenvolvido por [Gabriel Cordeiro](https://github.com/GabrielCordeiroBarrosoTeles)
-
----
-
-© 2023 Rocha Barber. Todos os direitos reservados.
+- Autenticação de administrador usando hash codificado
+- Validação de dados em todas as operações
+- Sanitização de entradas do usuário
+- Confirmação para operações críticas como exclusão de agendamentos

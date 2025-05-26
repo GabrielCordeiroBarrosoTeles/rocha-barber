@@ -1,0 +1,263 @@
+/* Estilos específicos para a tela de agendamento com foco em mobile-first */
+
+.agendamento-container {
+  padding: 1rem;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .agendamento-container {
+    max-width: 540px;
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .agendamento-container {
+    max-width: 640px;
+    padding: 2rem;
+  }
+}
+
+/* Card principal */
+.agendamento-card {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  background: white;
+  transition: all 0.3s ease;
+}
+
+/* Cabeçalho */
+.agendamento-header {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: white;
+}
+
+.agendamento-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Conteúdo */
+.agendamento-content {
+  padding: 1.5rem 1rem;
+}
+
+/* Serviço selecionado */
+.service-selected {
+  background: linear-gradient(to right, #fef3c7, #fffbeb);
+  border: 1px solid #fbbf24;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(251, 191, 36, 0.2);
+}
+
+.service-title {
+  font-weight: 700;
+  color: #92400e;
+  margin: 0 0 0.25rem 0;
+  font-size: 1.125rem;
+}
+
+.service-price {
+  color: #b45309;
+  font-size: 1rem;
+}
+
+/* Formulário */
+.agendamento-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Campos de formulário */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.875rem;
+}
+
+.form-input,
+.form-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.form-error {
+  color: #dc2626;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Plano mensal ativo */
+.plan-active {
+  background: linear-gradient(to right, #d1fae5, #ecfdf5);
+  border: 1px solid #10b981;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.plan-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.plan-title {
+  font-weight: 600;
+  color: #065f46;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.plan-counter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.plan-counter-label {
+  color: #047857;
+  font-size: 0.875rem;
+}
+
+.plan-counter-value {
+  background-color: #a7f3d0;
+  color: #065f46;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 1rem;
+}
+
+.plan-progress {
+  width: 100%;
+  height: 0.5rem;
+  background-color: #d1fae5;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.plan-progress-bar {
+  height: 100%;
+  background-color: #10b981;
+  border-radius: 9999px;
+}
+
+/* Botão de submissão */
+.submit-button {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  font-weight: 600;
+  padding: 0.875rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.submit-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+.submit-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Mensagens */
+.message {
+  padding: 0.875rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.message-success {
+  background-color: #d1fae5;
+  border: 1px solid #10b981;
+  color: #065f46;
+}
+
+.message-error {
+  background-color: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #b91c1c;
+}
+
+.message-warning {
+  background-color: #fffbeb;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+}
+
+/* Rodapé */
+.agendamento-footer {
+  padding: 1rem;
+  text-align: center;
+  border-top: 1px solid #f3f4f6;
+}
+
+.back-link {
+  color: #d97706;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: #92400e;
+  text-decoration: underline;
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
