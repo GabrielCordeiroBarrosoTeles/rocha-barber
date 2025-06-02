@@ -1,0 +1,7 @@
+Coloque as imagens dos serviços aqui:
+
+1. corte-cabelo.jpg - Imagem de um corte de cabelo
+2. barba.jpg - Imagem de um serviço de barba
+3. plano-mensal.jpg - Imagem para o plano mensal
+
+As imagens devem ter proporção aproximada de 16:9 ou 4:3 para melhor visualização nos cards.

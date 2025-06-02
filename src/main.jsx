@@ -5,13 +5,8 @@ import App from './App.jsx'
 import './index.css'
 import Agendamento from './components/Agendamento.jsx'
 import Admin from './components/Admin.jsx'
-import { initializeDatabase } from './lib/api.js'
 
-// Inicializa o banco de dados
-initializeDatabase().catch(error => {
-  console.error('Erro ao inicializar banco de dados:', error);
-});
-
+// Renderiza a aplicação primeiro
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
@@ -23,3 +18,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>,
 )
+
+// Inicializa o banco de dados em segundo plano
+setTimeout(() => {
+  import('./lib/api.js').then(({ initializeDatabase }) => {
+    initializeDatabase().catch(error => {
+      console.error('Erro ao inicializar banco de dados:', error);
+    });
+  });
+}, 1000);

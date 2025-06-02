@@ -14,7 +14,7 @@ export default function FAQ() {
     },
     {
       question: "O que é o plano mensal?",
-      answer: "O plano mensal dá direito a 4 cortes por mês por R$ 120,00. É ideal para quem deseja manter o visual sempre em dia com economia. Importante: ao usar o plano mensal, digite seu nome EXATAMENTE da mesma forma em todos os agendamentos para que o sistema reconheça seu plano."
+      answer: "O plano mensal dá direito a 4 cortes por mês por R$ 100,00. É ideal para quem deseja manter o visual sempre em dia com economia. Importante: ao usar o plano mensal, digite seu nome EXATAMENTE da mesma forma em todos os agendamentos para que o sistema reconheça seu plano."
     },
     {
       question: "Posso cancelar ou remarcar meu agendamento?",

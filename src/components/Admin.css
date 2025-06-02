@@ -1,0 +1,262 @@
+/* Admin.css - Estilos responsivos para o painel administrativo */
+
+/* Estilos para as abas */
+.admin-tab {
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 100px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .admin-tab {
+    padding: 0.75rem 0.5rem;
+    min-width: 33.333%;
+    font-size: 0.875rem;
+  }
+  
+  /* Ajustes para modais em telas pequenas */
+  .fixed.inset-0 > div {
+    width: 95% !important;
+    max-width: 95% !important;
+    padding: 1rem !important;
+    margin: 0 auto;
+  }
+  
+  .fixed.inset-0 .grid-cols-\[auto_1fr\] {
+    gap: 0.5rem !important;
+  }
+  
+  .fixed.inset-0 .text-xl {
+    font-size: 1.1rem !important;
+  }
+  
+  .fixed.inset-0 .p-6 {
+    padding: 1rem !important;
+  }
+  
+  .fixed.inset-0 .p-4 {
+    padding: 0.75rem !important;
+  }
+  
+  .fixed.inset-0 .px-5 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+.admin-tab-active {
+  background-color: white;
+  color: #d97706; /* amber-600 */
+  border-bottom: 2px solid #d97706;
+}
+
+.admin-tab-inactive {
+  color: #71717a; /* zinc-500 */
+  border-bottom: 2px solid transparent;
+}
+
+.admin-tab-inactive:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #d97706; /* amber-600 */
+}
+
+/* Estilos para tabelas responsivas */
+.admin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+@media (max-width: 640px) {
+  .admin-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .admin-table-cell {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .admin-table-header-cell {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .btn-danger, .btn-whatsapp {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    width: 100%;
+    margin-bottom: 0.25rem;
+    justify-content: center;
+  }
+  
+  .admin-table-cell.text-right .flex {
+    flex-direction: column;
+  }
+}
+
+.admin-table-header {
+  background-color: #f4f4f5; /* zinc-100 */
+}
+
+.admin-table-header-cell {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 500;
+  color: #52525b; /* zinc-600 */
+  border-bottom: 1px solid #e4e4e7; /* zinc-200 */
+}
+
+.admin-table-row:hover {
+  background-color: #fafafa; /* zinc-50 */
+}
+
+.admin-table-cell {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f4f4f5; /* zinc-100 */
+}
+
+/* Estilos para botões de ação */
+.btn-danger {
+  background-color: #ef4444; /* red-500 */
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626; /* red-600 */
+}
+
+.btn-whatsapp {
+  background-color: #10b981; /* emerald-500 */
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-whatsapp:hover {
+  background-color: #059669; /* emerald-600 */
+}
+
+/* Estilos para badges */
+.badge-primary {
+  background-color: #10b981; /* emerald-500 */
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-secondary {
+  background-color: #d97706; /* amber-600 */
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Estilos para cards de clientes mensais */
+@media (max-width: 640px) {
+  .grid-cols-1 {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-content {
+    padding: 0.75rem !important;
+  }
+  
+  .card-header {
+    padding: 0.75rem !important;
+  }
+}
+
+/* Estilos para títulos de seção */
+.admin-section-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #18181b; /* zinc-900 */
+}
+
+@media (max-width: 640px) {
+  .admin-section-title {
+    font-size: 1.125rem;
+  }
+  
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* Estilos para inputs em telas pequenas */
+@media (max-width: 640px) {
+  .flex.gap-2 {
+    flex-direction: column;
+  }
+  
+  .flex.gap-2 .flex-1 {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .flex.gap-2 button {
+    width: 100%;
+  }
+}
+
+/* Estilos específicos para os horários disponíveis */
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 480px) {
+  .grid-cols-2 > div {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* Estilos para os botões de ação na tabela */
+@media (max-width: 640px) {
+  .admin-table-cell.text-right .flex {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  
+  .admin-table-cell.text-right .btn-whatsapp,
+  .admin-table-cell.text-right .btn-danger {
+    width: 100%;
+    margin-bottom: 0.25rem;
+    justify-content: center;
+  }
+  
+  /* Ajustes para modais em dispositivos móveis */
+  .fixed.inset-0 .flex.justify-end.gap-3 {
+    flex-direction: column;
+  }
+  
+  .fixed.inset-0 .flex.justify-end.gap-3 button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}

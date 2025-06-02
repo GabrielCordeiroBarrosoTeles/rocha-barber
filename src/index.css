@@ -2,10 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Estilos globais */
+body {
+  font-family: 'Inter', sans-serif;
+  color: #27272a;
+  background-color: #f9fafb;
+}
+
+/* Estilos para o painel administrativo */
+.admin-header {
+  @apply flex justify-between items-center border-b border-amber-200 bg-gradient-to-r from-amber-50 to-zinc-50;
+}
+
+.admin-title {
+  @apply text-xl md:text-2xl font-bold text-amber-800;
+}
+
+.admin-section-title {
+  @apply text-lg font-semibold mb-4 flex items-center gap-2 text-amber-800 border-b border-amber-100 pb-2;
+}
+
+.admin-tab {
+  @apply px-4 py-3 font-medium transition-all;
+}
+
+.admin-tab-active {
+  @apply text-amber-800 border-b-2 border-amber-500 bg-gradient-to-b from-transparent to-amber-50;
+}
+
+.admin-tab-inactive {
+  @apply text-zinc-500 hover:text-amber-700 hover:bg-amber-50/30;
+}
+
+.admin-table {
+  @apply min-w-full divide-y divide-zinc-200 border border-zinc-200 rounded-lg overflow-hidden;
+}
+
+.admin-table-header {
+  @apply bg-gradient-to-r from-amber-50 to-zinc-50;
+}
+
+.admin-table-header-cell {
+  @apply px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wider;
+}
+
+.admin-table-row {
+  @apply hover:bg-zinc-50 transition-colors;
+}
+
+.admin-table-cell {
+  @apply px-4 py-3 whitespace-nowrap;
+}
+
+/* Botões */
+.btn-primary {
+  @apply bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition-all;
+}
+
+.btn-secondary {
+  @apply bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-medium py-2 px-4 rounded-md border border-zinc-300 transition-all;
+}
+
+.btn-danger {
+  @apply bg-red-100 hover:bg-red-200 text-red-700 font-medium py-1.5 px-3 rounded-md border border-red-200 transition-all text-sm;
+}
+
+.btn-whatsapp {
+  @apply bg-green-100 hover:bg-green-200 text-green-700 font-medium py-1.5 px-3 rounded-md border border-green-200 transition-all text-sm;
+}
+
+/* Badges */
+.badge-primary {
+  @apply bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded-full;
+}
+
+.badge-secondary {
+  @apply bg-zinc-100 text-zinc-800 text-xs font-medium px-2.5 py-0.5 rounded-full;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full;
+}
+
+.badge-danger {
+  @apply bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full;
+}
+
+/* Animações */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -17,140 +104,16 @@
   animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Animação de pulsação para o card em destaque */
-@keyframes pulse-slow {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.03);
-  }
+/* Estilos para o modal */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm;
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 3s ease-in-out infinite;
+.modal-content {
+  @apply bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-amber-500 animate-fadeIn;
 }
 
-/* Animação de slide para cima */
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-slideUp {
-  animation: slideUp 0.5s ease-out forwards;
-}
-
-/* Estilos personalizados para o Admin */
-.admin-card {
-  @apply bg-white rounded-xl shadow-lg border border-zinc-100 overflow-hidden transition-all hover:shadow-xl;
-}
-
-.admin-header {
-  @apply bg-gradient-to-r from-amber-500 to-amber-600 text-white p-5 flex justify-between items-center;
-}
-
-.admin-title {
-  @apply text-2xl font-bold;
-}
-
-.admin-tab {
-  @apply py-3 px-6 font-medium transition-all;
-}
-
-.admin-tab-active {
-  @apply border-b-2 border-amber-500 text-amber-600 font-semibold;
-}
-
-.admin-tab-inactive {
-  @apply text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50;
-}
-
-.admin-content {
-  @apply p-6;
-}
-
-.admin-section-title {
-  @apply text-xl font-semibold mb-4 text-zinc-800 flex items-center gap-2;
-}
-
-.admin-table {
-  @apply min-w-full divide-y divide-zinc-200 rounded-lg overflow-hidden border border-zinc-200;
-}
-
-.admin-table-header {
-  @apply bg-gradient-to-r from-zinc-50 to-amber-50;
-}
-
-.admin-table-header-cell {
-  @apply px-6 py-3 text-left text-xs font-medium text-zinc-600 uppercase tracking-wider;
-}
-
-.admin-table-row {
-  @apply hover:bg-amber-50 transition-colors;
-}
-
-.admin-table-cell {
-  @apply px-6 py-4 whitespace-nowrap;
-}
-
-/* Estilos para o componente de agendamento */
-.appointment-card {
-  @apply bg-white rounded-xl shadow-lg border border-zinc-100 overflow-hidden transition-all;
-}
-
-.appointment-header {
-  @apply bg-gradient-to-r from-amber-500 to-amber-600 text-white p-5;
-}
-
-.appointment-title {
-  @apply text-2xl font-bold text-center;
-}
-
-.appointment-content {
-  @apply p-6;
-}
-
-.appointment-footer {
-  @apply p-4 bg-zinc-50 border-t border-zinc-100 flex justify-center;
-}
-
-.appointment-service-selected {
-  @apply mb-6 p-4 bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg border border-amber-200 flex justify-between items-center;
-}
-
-.appointment-plan-active {
-  @apply p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border border-green-200 mb-4;
-}
-
-/* Estilos para botões */
-.btn-primary {
-  @apply px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-medium rounded-lg transition-all shadow-sm;
-}
-
-.btn-secondary {
-  @apply px-5 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-medium rounded-lg transition-all border border-zinc-300;
-}
-
-.btn-danger {
-  @apply px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium rounded-lg transition-all shadow-sm;
-}
-
-/* Estilos para badges */
-.badge-primary {
-  @apply bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded-full;
-}
-
-.badge-success {
-  @apply bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full;
-}
-
-.badge-danger {
-  @apply bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full;
+/* Estilos para o WhatsApp */
+.whatsapp-button {
+  @apply inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition-all;
 }

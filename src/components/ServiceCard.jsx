@@ -1,76 +1,93 @@
-import { Button } from "./ui/button"
+import React from 'react';
+import './ServiceCard.css';
 
-export default function ServiceCard({ title, description, price, image, imageSrc, featured, additionalInfo, benefits, whatsappNumber }) {
-  // Função para selecionar o serviço e redirecionar para a página de agendamento
-  const handleSelectService = () => {
-    // Salvar o serviço selecionado no localStorage
-    localStorage.setItem('selectedService', JSON.stringify({
+export default function ServiceCard({ 
+  title, 
+  description, 
+  price, 
+  imageSrc, 
+  additionalInfo, 
+  benefits = [], 
+  featured = false 
+}) {
+  console.log('Renderizando card com imagem:', imageSrc);
+  const handleClick = () => {
+    // Salva o serviço selecionado no localStorage
+    const serviceData = {
       title,
-      description,
-      price
-    }));
+      price,
+      description
+    };
     
-    // Redirecionar para a página de agendamento
+    localStorage.setItem('selectedService', JSON.stringify(serviceData));
+    console.log('Serviço salvo no localStorage:', serviceData);
+    
+    // Navega para a página de agendamento
     window.location.href = '/agendamento';
   };
 
-  // Determinar se este é o card do plano mensal (para adicionar a tag "Mais Popular")
-  const isPlanCard = title === "Plano Mensal";
-
   return (
-    <div className={`bg-white rounded-xl overflow-hidden shadow-lg border border-zinc-100 transition-all hover:shadow-xl h-full flex flex-col ${featured ? 'ring-2 ring-amber-500' : ''}`}>
-      <div className="h-48 overflow-hidden">
+    <div 
+      className={`bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl ${
+        featured ? 'border-2 border-amber-500 transform hover:-translate-y-2 featured-card' : 'hover:-translate-y-1'
+      }`}
+    >
+      {/* Imagem do serviço */}
+      <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden service-card-image">
         <img 
-          src={imageSrc || image} 
+          src={imageSrc || `/images/${title.toLowerCase().replace(/\s+/g, '-')}.png`} 
           alt={title} 
-          className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            console.error(`Erro ao carregar imagem: ${e.target.src}`);
+            e.target.src = '/images/barbershop.png'; // Imagem de fallback
+          }}
         />
-      </div>
-      <div className="p-6 flex flex-col flex-grow">
-        {isPlanCard && (
-          <span className="inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2 py-1 rounded-full mb-2">
+        {featured && (
+          <div className="absolute top-0 right-0 bg-amber-500 text-white px-4 py-1 rounded-bl-lg font-medium featured-badge">
             Mais Popular
-          </span>
+          </div>
         )}
-        <h3 className="text-xl font-bold text-zinc-900 mb-1">{title}</h3>
-        <p className="text-zinc-600 mb-4">{description}</p>
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-amber-600 font-bold text-lg">{price}</span>
-        </div>
-        
-        {additionalInfo && (
-          <p className="text-zinc-600 text-sm mb-4 border-t border-zinc-100 pt-4">
-            {additionalInfo}
-          </p>
-        )}
-        
-        {benefits && benefits.length > 0 && (
-          <ul className="space-y-2 mb-4 flex-grow">
+      </div>
+      
+      {/* Conteúdo do card */}
+      <div className="p-5 service-card-content">
+        <div>
+          <h3 className="text-xl font-bold text-zinc-900 service-card-title">{title}</h3>
+          <p className="text-zinc-600 mb-2 service-card-description">{description}</p>
+          
+          <p className="text-2xl font-bold text-amber-600 mb-3 service-card-price">{price}</p>
+          
+          <p className="text-zinc-700 mb-4 text-sm service-card-info">{additionalInfo}</p>
+          
+          {/* Lista de benefícios */}
+          <ul className="space-y-2 mb-5 service-benefits">
             {benefits.map((benefit, index) => (
               <li key={index} className="flex items-start">
-                <svg className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                <svg className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span className="text-zinc-700 text-sm">{benefit}</span>
               </li>
             ))}
           </ul>
-        )}
-        
-        <div className="text-center text-xs text-zinc-500 italic mb-4">
-          {isPlanCard ? 
-            '"Tudo posso naquele que me fortalece." - Filipenses 4:13' : 
-            '"Porque o Senhor dá a sabedoria." - Provérbios 2:6'}
         </div>
         
-        <Button 
-          variant="primary" 
-          onClick={handleSelectService}
-          className="w-full bg-amber-600 hover:bg-amber-700 py-2.5 mt-auto"
-        >
-          Agendar Agora
-        </Button>
+        <div className="mt-auto">
+          {/* Versículo */}
+          <p className="text-xs text-zinc-500 italic mb-5 service-card-verse text-center">
+            "Porque o Senhor dá a sabedoria." - Provérbios 2:6
+          </p>
+          
+          {/* Botão de agendamento */}
+          <button 
+            onClick={handleClick}
+            className="w-full py-3 rounded-lg font-bold text-white transition-all service-card-button bg-gradient-to-r from-amber-600 to-amber-800 hover:from-amber-700 hover:to-amber-900 shadow-md"
+          >
+            Agendar Agora
+          </button>
+        </div>
       </div>
     </div>
-  )
+  );
 }

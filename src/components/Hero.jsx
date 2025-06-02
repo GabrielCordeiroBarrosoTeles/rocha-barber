@@ -30,7 +30,7 @@ export default function Hero() {
         </p>
         <div className="mt-8 space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
           <a
-            href="/agendamento"
+            href="#servicos"
             className="block sm:inline-block transform hover:scale-105 transition-transform duration-300"
           >
             <Button variant="gradient" className="w-full sm:w-auto text-lg px-8 py-3 h-auto">

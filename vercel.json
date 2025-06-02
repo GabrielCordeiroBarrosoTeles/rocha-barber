@@ -2,16 +2,9 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "routes": [
-    {
-      "src": "/[^.]+",
-      "dest": "/",
-      "status": 200
-    }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
   ],
-  "github": {
-    "silent": true
-  },
   "headers": [
     {
       "source": "/(.*)",

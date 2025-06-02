@@ -1,0 +1,1 @@
+\"1. Corrigir o limite de 4 agendamentos por màs no plano mensal\n2. Manter o bot∆o do WhatsApp no Admin\n3. Garantir que as configuraá‰es de dias de trabalho sejam respeitadas\n4. Garantir que as alteraá‰es de hor†rios sejam vis°veis para os clientes\" 

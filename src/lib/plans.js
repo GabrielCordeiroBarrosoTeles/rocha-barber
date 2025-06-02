@@ -1,3 +1,18 @@
+import { createClient } from '@supabase/supabase-js';
+import { 
+  getClientPlan as getClientPlanFromDB, 
+  createClientPlan as createClientPlanInDB, 
+  updateClientPlan as updateClientPlanInDB, 
+  getOrCreateClient 
+} from './database';
+
+// Configuração do Supabase - usando import.meta.env para Vite
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+// Inicializa o cliente Supabase
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // Definição dos planos disponíveis
 export const PLANS = {
   MONTHLY: 'monthly',
@@ -20,174 +35,240 @@ export const PLAN_CONFIG = {
   }
 };
 
-import { syncData, saveAndSync } from './database';
-
 // Funções para gerenciar os planos dos clientes
 export async function getClientPlans() {
-  const plans = await syncData('clientPlans', {});
+  // Implementar busca de todos os planos no Supabase
+  const { data, error } = await supabase
+    .from('client_plans')
+    .select(`
+      id, plan_type, remaining_appointments, month, year,
+      clients (id, name)
+    `);
+  
+  if (error) {
+    console.error('Erro ao buscar planos:', error);
+    return {};
+  }
+  
+  // Formata os dados para o formato esperado pelo frontend
+  const plans = {};
+  data.forEach(plan => {
+    if (plan.clients) {
+      plans[plan.clients.name] = {
+        type: plan.plan_type,
+        remainingAppointments: plan.remaining_appointments,
+        month: plan.month,
+        year: plan.year
+      };
+    }
+  });
+  
   return plans;
 }
 
-export async function saveClientPlans(plans) {
-  await saveAndSync('clientPlans', plans);
-}
-
 export async function getClientPlan(clientName) {
-  const plans = await getClientPlans();
-  return plans[clientName] || null;
+  try {
+    console.log("getClientPlan chamado para:", clientName);
+    
+    // Busca o cliente pelo nome
+    const client = await getOrCreateClient(clientName);
+    console.log("Cliente encontrado:", client);
+    
+    if (!client) return null;
+    
+    // Busca o plano do cliente
+    const plan = await getClientPlanFromDB(client.id);
+    console.log("Plano encontrado:", plan);
+    
+    // Se encontrou um plano, formata para o formato esperado pelo frontend
+    if (plan) {
+      // Para planos mensais, sempre retornar 4 cortes disponíveis
+      if (plan.plan_type === PLANS.MONTHLY) {
+        const maxAppointments = PLAN_CONFIG[PLANS.MONTHLY].maxAppointments;
+        
+        return {
+          id: plan.id,
+          type: plan.plan_type,
+          remainingAppointments: maxAppointments, // Sempre 4 cortes disponíveis
+          month: plan.month,
+          year: plan.year,
+          clientId: client.id
+        };
+      }
+      
+      // Para outros tipos de plano, retorna o valor do banco
+      return {
+        id: plan.id,
+        type: plan.plan_type,
+        remainingAppointments: plan.remaining_appointments,
+        month: plan.month,
+        year: plan.year,
+        clientId: client.id
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("Erro em getClientPlan:", error);
+    return null;
+  }
 }
 
 export async function createClientPlan(clientName, planType) {
-  const plans = await getClientPlans();
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
+  // Busca ou cria o cliente
+  const client = await getOrCreateClient(clientName);
+  if (!client) return null;
   
-  plans[clientName] = {
-    type: planType,
-    startDate: new Date().toISOString(),
-    month: currentMonth,
-    year: currentYear,
-    remainingAppointments: PLAN_CONFIG[planType].maxAppointments,
-    appointments: []
-  };
-  
-  await saveClientPlans(plans);
-  return plans[clientName];
+  // Cria o plano
+  return await createClientPlanInDB(client.id, planType);
 }
 
 export async function updateClientPlan(clientName, appointment) {
-  const plans = await getClientPlans();
-  
-  if (!plans[clientName]) {
-    return false;
-  }
-  
-  // Verificar se o plano é do mês atual
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
-  
-  if (plans[clientName].month !== currentMonth || plans[clientName].year !== currentYear) {
-    // Guardar histórico do mês anterior
-    if (!plans[clientName].history) {
-      plans[clientName].history = [];
-    }
-    
-    plans[clientName].history.push({
-      month: plans[clientName].month,
-      year: plans[clientName].year,
-      appointments: plans[clientName].appointments,
-      used: PLAN_CONFIG[plans[clientName].type].maxAppointments - plans[clientName].remainingAppointments
-    });
-    
-    // Limitar histórico a 12 meses
-    if (plans[clientName].history.length > 12) {
-      plans[clientName].history.shift();
-    }
-    
-    // Renovar plano para o mês atual - os planos são renovados automaticamente a cada mês
-    plans[clientName].month = currentMonth;
-    plans[clientName].year = currentYear;
-    plans[clientName].remainingAppointments = PLAN_CONFIG[plans[clientName].type].maxAppointments;
-    plans[clientName].appointments = [];
-    
-    // Atualiza a data de início para o mês atual
-    plans[clientName].startDate = new Date().toISOString();
-  }
-  
-  // Verificar se ainda tem agendamentos disponíveis
-  if (plans[clientName].remainingAppointments <= 0) {
-    return false;
-  }
-  
-  // Registrar o agendamento e diminuir o contador
-  plans[clientName].appointments.push({
-    ...appointment,
-    date: appointment.date,
-    createdAt: new Date().toISOString()
-  });
-  plans[clientName].remainingAppointments--;
-  
-  await saveClientPlans(plans);
+  // Esta função não é mais usada diretamente para agendamentos
+  // A lógica foi movida para a função addAppointment em appointments.js
   return true;
 }
 
 // Função para adicionar um agendamento de volta ao plano quando um agendamento é cancelado
-// e remover o agendamento do histórico se necessário
 export async function restoreAppointmentToClientPlan(clientName, appointmentDate, appointmentTime) {
   if (!clientName) return false;
   
-  const plans = await getClientPlans();
-  if (!plans[clientName] || plans[clientName].type !== PLANS.MONTHLY) {
+  // Busca o cliente pelo nome
+  const client = await getOrCreateClient(clientName);
+  if (!client) return false;
+  
+  // Busca o plano do cliente
+  const plan = await getClientPlanFromDB(client.id);
+  if (!plan || plan.plan_type !== PLANS.MONTHLY) {
     return false;
   }
   
-  // Adiciona +1 ao contador de agendamentos restantes
-  plans[clientName].remainingAppointments++;
+  // Incrementa o contador de agendamentos restantes
+  await updateClientPlanInDB(plan.id, plan.remaining_appointments + 1);
   
-  // Garante que não ultrapasse o máximo permitido
-  const maxAppointments = PLAN_CONFIG[plans[clientName].type].maxAppointments;
-  if (plans[clientName].remainingAppointments > maxAppointments) {
-    plans[clientName].remainingAppointments = maxAppointments;
-  }
-  
-  // Remove o agendamento da lista de agendamentos do cliente
-  if (plans[clientName].appointments && plans[clientName].appointments.length > 0) {
-    plans[clientName].appointments = plans[clientName].appointments.filter(app => 
-      !(app.date === appointmentDate && app.time === appointmentTime)
-    );
-  }
-  
-  // Remove o agendamento do histórico se existir
-  if (plans[clientName].history && plans[clientName].history.length > 0) {
-    plans[clientName].history = plans[clientName].history.map(hist => {
-      if (hist.appointments && hist.appointments.length > 0) {
-        hist.appointments = hist.appointments.filter(app => 
-          !(app.date === appointmentDate && app.time === appointmentTime)
-        );
-        
-        // Atualiza o contador de uso se um agendamento foi removido
-        const originalLength = hist.appointments.length;
-        const newLength = hist.appointments.length;
-        if (originalLength !== newLength) {
-          hist.used = Math.max(0, hist.used - 1);
-        }
-      }
-      return hist;
-    });
-  }
-  
-  await saveClientPlans(plans);
   return true;
 }
 
 export async function getClientMonthlyStats() {
-  const plans = await getClientPlans();
-  const stats = [];
-  
-  Object.entries(plans).forEach(([clientName, plan]) => {
-    if (plan.type === PLANS.MONTHLY) {
-      stats.push({
-        name: clientName,
-        used: PLAN_CONFIG[PLANS.MONTHLY].maxAppointments - plan.remainingAppointments,
-        remaining: plan.remainingAppointments,
+  try {
+    // Busca todos os clientes com planos mensais
+    const { data: plansData, error: plansError } = await supabase
+      .from('client_plans')
+      .select(`
+        id, plan_type, remaining_appointments, month, year, created_at,
+        clients (id, name)
+      `)
+      .eq('plan_type', PLANS.MONTHLY);
+    
+    if (plansError) {
+      console.error('Erro ao buscar estatísticas:', plansError);
+      return [];
+    }
+    
+    // Busca todos os agendamentos
+    const { data: appointmentsData, error: appointmentsError } = await supabase
+      .from('appointments')
+      .select('id, client_id, date, time, service, client_plan_id, plan_type')
+      .order('date', { ascending: true });
+    
+    if (appointmentsError) {
+      console.error('Erro ao buscar agendamentos:', appointmentsError);
+    }
+    
+    // Também busca agendamentos do localStorage para garantir que temos os mais recentes
+    const localAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+    
+    // Formata os dados para o formato esperado pelo frontend
+    return plansData.map(plan => {
+      // Filtrar agendamentos deste plano do Supabase
+      const clientAppointmentsFromDB = appointmentsData
+        ?.filter(app => app.client_plan_id === plan.id)
+        .sort((a, b) => new Date(a.date) - new Date(b.date)) || [];
+      
+      // Filtrar agendamentos deste plano do localStorage
+      const clientAppointmentsFromLocal = localAppointments
+        .filter(app => app.planType === 'monthly' && 
+                      app.name === plan.clients?.name)
+        .map(app => ({
+          id: app.id,
+          client_id: plan.clients?.id,
+          date: app.date,
+          time: app.time,
+          service: app.service,
+          client_plan_id: plan.id,
+          plan_type: 'monthly'
+        }));
+      
+      // Combinar agendamentos de ambas as fontes, removendo duplicados
+      const allAppointments = [...clientAppointmentsFromDB];
+      clientAppointmentsFromLocal.forEach(localApp => {
+        if (!allAppointments.some(dbApp => dbApp.id === localApp.id)) {
+          allAppointments.push(localApp);
+        }
+      });
+      
+      // Ordenar por data
+      const clientAppointments = allAppointments.sort((a, b) => new Date(a.date) - new Date(b.date));
+      
+      // Encontrar o primeiro agendamento deste plano
+      const firstAppointment = clientAppointments.length > 0 ? clientAppointments[0] : null;
+      
+      // Calcular dias restantes no plano
+      const today = new Date();
+      let daysLeft = 0;
+      
+      if (firstAppointment) {
+        // Usar a data do primeiro agendamento como referência
+        const firstDate = new Date(firstAppointment.date);
+        
+        // Adicionar 30 dias à data do primeiro agendamento
+        const expiryDate = new Date(firstDate);
+        expiryDate.setDate(firstDate.getDate() + 30);
+        
+        // Calcular dias restantes
+        const timeDiff = expiryDate.getTime() - today.getTime();
+        daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        
+        // Se for negativo, não há mais dias restantes
+        if (daysLeft < 0) daysLeft = 0;
+      }
+      
+      // Formatar os agendamentos para exibição
+      const formattedAppointments = clientAppointments.map(app => ({
+        id: app.id,
+        date: app.date,
+        time: app.time,
+        service: app.service
+      }));
+      
+      // Usar o número real de agendamentos
+      const usedAppointments = clientAppointments.length;
+      
+      // Calcular cortes restantes com base no total menos os usados
+      const remaining = PLAN_CONFIG[PLANS.MONTHLY].maxAppointments - usedAppointments;
+      
+      return {
+        id: plan.id,
+        name: plan.clients?.name || 'Cliente desconhecido',
+        clientId: plan.clients?.id,
+        used: usedAppointments,
+        remaining: remaining >= 0 ? remaining : 0, // Garantir que não seja negativo
         total: PLAN_CONFIG[PLANS.MONTHLY].maxAppointments,
         month: plan.month,
         year: plan.year,
-        appointments: plan.appointments || [],
-        history: plan.history || []
-      });
-    }
-  });
-  
-  return stats;
+        daysLeft: daysLeft,
+        firstAppointmentDate: firstAppointment?.date,
+        appointments: formattedAppointments
+      };
+    });
+  } catch (error) {
+    console.error('Erro ao processar estatísticas de planos mensais:', error);
+    return [];
+  }
 }
 
 // Função para obter o histórico de um cliente específico
 export async function getClientHistory(clientName) {
-  const plan = await getClientPlan(clientName);
-  if (!plan || plan.type !== PLANS.MONTHLY) {
-    return [];
-  }
-  
-  return plan.history || [];
+  // Implementar busca de histórico no Supabase
+  return [];
 }

@@ -29,6 +29,9 @@ export function getDayOfWeek(dateString) {
       return -1;
     }
     
+    // Log para debug
+    console.log(`Data: ${dateString}, dia da semana: ${date.getDay()}`);
+    
     return date.getDay();
   } catch (error) {
     console.error('Erro ao obter dia da semana:', error);
@@ -73,6 +76,9 @@ export function formatDate(dateString) {
 export function isWorkingDay(dateString, workingDaysConfig) {
   const dayOfWeek = getDayOfWeek(dateString);
   if (dayOfWeek === -1) return false;
+  
+  // Log para debug
+  console.log(`Verificando dia de trabalho: ${dateString}, dia da semana: ${dayOfWeek}, configuração:`, workingDaysConfig);
   
   return workingDaysConfig[dayOfWeek] === true;
 }

@@ -1,56 +1,54 @@
 // api.js - Funções para integração com API e sincronização de dados
-import { loadFromIndexedDB, saveToIndexedDB, exportAllData as exportData } from './database';
+import { 
+  getWorkingDays, 
+  updateWorkingDays, 
+  getTimeSlots, 
+  updateTimeSlots, 
+  exportAllData, 
+  migrateLocalDataToSupabase,
+  importData
+} from './database';
 
 // Função para inicializar o banco de dados
 export async function initializeDatabase() {
-  if (typeof window !== 'undefined') {
-    console.log('Inicializando banco de dados...');
+  console.log('Inicializando banco de dados...');
+  
+  // Valores padrão para inicialização
+  const defaultWorkingDays = {
+    0: false, // Domingo
+    1: true,  // Segunda
+    2: true,  // Terça
+    3: true,  // Quarta
+    4: true,  // Quinta
+    5: true,  // Sexta
+    6: true   // Sábado
+  };
+  
+  const defaultTimeSlots = [
+    "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", 
+    "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", 
+    "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", 
+    "17:00", "17:30"
+  ];
+  
+  try {
+    // Inicializa os dias de trabalho
+    await updateWorkingDays(defaultWorkingDays);
     
-    // Valores padrão para inicialização
-    const defaultData = {
-      workingDays: {
-        0: false, // Domingo
-        1: true,  // Segunda
-        2: true,  // Terça
-        3: true,  // Quarta
-        4: true,  // Quinta
-        5: true,  // Sexta
-        6: true   // Sábado
-      },
-      timeSlots: [
-        "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", 
-        "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", 
-        "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", 
-        "17:00", "17:30"
-      ],
-      appointments: [],
-      clientPlans: {}
-    };
+    // Inicializa os horários
+    await updateTimeSlots(defaultTimeSlots);
     
-    // Inicializa cada chave se não existir
-    for (const [key, value] of Object.entries(defaultData)) {
-      try {
-        const existingData = await loadFromIndexedDB(key);
-        if (!existingData) {
-          // Se não existir no IndexedDB, inicializa com o valor padrão
-          await saveToIndexedDB(key, value);
-          
-          // Também salva no localStorage para acesso rápido
-          if (localStorage.getItem(key) === null) {
-            localStorage.setItem(key, JSON.stringify(value));
-          }
-        }
-      } catch (error) {
-        console.error(`Erro ao inicializar ${key}:`, error);
-      }
+    // Tenta migrar dados locais para o Supabase (se existirem)
+    if (typeof window !== 'undefined') {
+      await migrateLocalDataToSupabase();
     }
+  } catch (error) {
+    console.error('Erro ao inicializar banco de dados:', error);
   }
 }
 
 // Função para exportar todos os dados como JSON
-export async function exportAllData() {
-  return await exportData();
-}
+export { exportAllData };
 
 // Função para importar dados de um arquivo JSON
 export async function importDataFromFile(file) {
@@ -60,25 +58,7 @@ export async function importDataFromFile(file) {
     reader.onload = async (event) => {
       try {
         const jsonData = event.target.result;
-        const data = JSON.parse(jsonData);
-        
-        // Verifica se o formato é válido
-        if (!data.appointments || !data.clientPlans || !data.workingDays || !data.timeSlots) {
-          reject(new Error('Formato de dados inválido'));
-          return;
-        }
-        
-        // Importa cada conjunto de dados
-        for (const [key, value] of Object.entries(data)) {
-          if (key !== 'exportDate') {
-            // Salva no IndexedDB
-            await saveToIndexedDB(key, value);
-            
-            // Atualiza o localStorage
-            localStorage.setItem(key, JSON.stringify(value));
-          }
-        }
-        
+        await importData(jsonData);
         resolve(true);
       } catch (error) {
         console.error('Erro ao importar dados:', error);

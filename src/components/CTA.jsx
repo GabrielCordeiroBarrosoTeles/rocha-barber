@@ -9,7 +9,7 @@ export default function CTA() {
           Agende seu horário agora mesmo e experimente o melhor serviço de barbearia da região.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <a href="/agendamento">
+          <a href="#servicos">
             <Button 
               variant="secondary" 
               className="bg-white text-amber-600 hover:bg-zinc-100 border-white px-8 py-3 h-auto text-lg"

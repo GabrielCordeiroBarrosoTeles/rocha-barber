@@ -106,6 +106,14 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
 * Dúvidas comuns respondidas de forma clara
 * Orientações sobre o plano mensal e funcionamento
 
+### 🪟 Sistema de Modais Otimizado
+
+* Modais com dimensionamento automático (não esticados)
+* Altura adaptativa baseada no conteúdo (`fit-content`)
+* Rolagem vertical quando necessário
+* Classe específica para modal de confirmação
+* Design responsivo em todos os dispositivos
+
 ---
 
 ## 🌐 Implantação no Vercel
@@ -119,7 +127,19 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
    * Framework: **Vite**
    * Comando de build: `npm run build`
    * Diretório de saída: `dist`
-   * Configurações para SPA
+   * Configurações para SPA com rotas client-side
+   * Cache otimizado para assets estáticos
+
+### Configurações importantes para o Vercel:
+
+* O arquivo `vercel.json` já está configurado com:
+  * Regras de rewrite para SPA (todas as rotas direcionadas para index.html)
+  * Headers de cache otimizados (assets imutáveis com cache longo)
+  * Configuração correta para o framework Vite
+
+* O arquivo `vite.config.js` está configurado sem base path para funcionar corretamente na Vercel
+
+* O arquivo `.vercelignore` exclui arquivos desnecessários do deploy
 
 Após o deploy, seu sistema estará ativo com domínio próprio da Vercel.
 
@@ -151,11 +171,50 @@ npm run preview
 
 ---
 
+## 💅 Guia de Estilização
+
+### Modais
+
+O sistema utiliza um conjunto de estilos CSS para garantir que os modais tenham aparência e comportamento consistentes:
+
+```css
+/* Estilos para modais */
+.fixed.inset-0 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.fixed.inset-0 > div {
+  width: auto;
+  max-width: 450px;
+  min-width: 300px;
+  margin: 0 auto;
+  max-height: fit-content;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+```
+
+Para modais de confirmação específicos, use a classe `.confirmation-modal`:
+
+```css
+.confirmation-modal {
+  height: auto !important;
+  align-self: flex-start;
+  width: 100%;
+}
+```
+
+---
+
 ## ❓ Perguntas Frequentes (FAQ)
 
 ### Como faço um agendamento?
 
-Clique em “**Agende seu horário**”, informe seu nome, selecione o serviço, escolha a data e o horário disponíveis. Após isso, você receberá a confirmação do agendamento.
+Clique em "**Agende seu horário**", informe seu nome, selecione o serviço, escolha a data e o horário disponíveis. Após isso, você receberá a confirmação do agendamento.
 
 ### O que é o plano mensal?
 

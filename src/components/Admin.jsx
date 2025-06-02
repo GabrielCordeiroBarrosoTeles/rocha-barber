@@ -5,6 +5,7 @@ import { Select } from "./ui/select";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { getClientMonthlyStats, PLAN_CONFIG, PLANS } from "../lib/plans";
+import './Admin.css';
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -20,7 +21,7 @@ export default function Admin() {
     3: true,  // Quarta
     4: true,  // Quinta
     5: true,  // Sexta
-    6: false  // Sábado - Fechado por padrão
+    6: true   // Sábado - Aberto por padrão
   });
   const [timeSlots, setTimeSlots] = useState([
     "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", 
@@ -216,6 +217,18 @@ export default function Admin() {
             <span class="text-zinc-500 font-medium">Cliente:</span>
             <span class="text-zinc-800 font-semibold">${appointment.name}</span>
             
+            ${appointment.phone ? `
+            <span class="text-zinc-500 font-medium">WhatsApp:</span>
+            <span class="text-zinc-800">
+              <a href="https://wa.me/55${appointment.phone.replace(/\D/g, '')}" target="_blank" class="text-green-600 hover:text-green-800 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                </svg>
+                ${appointment.phone}
+              </a>
+            </span>
+            ` : ''}
+            
             <span class="text-zinc-500 font-medium">Serviço:</span>
             <span class="text-zinc-800">${appointment.service}</span>
             
@@ -240,9 +253,9 @@ export default function Admin() {
           ` : ''}
         </div>
         
-        <div class="flex justify-end gap-3">
-          <button id="cancel-delete" class="px-5 py-2.5 bg-zinc-100 hover:bg-zinc-200 rounded-lg text-zinc-700 font-medium transition-all border border-zinc-300">Cancelar</button>
-          <button id="confirm-delete" class="px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-lg text-white font-medium transition-all shadow-sm">Excluir</button>
+        <div class="flex flex-col sm:flex-row justify-end gap-3">
+          <button id="cancel-delete" class="px-5 py-2.5 bg-zinc-100 hover:bg-zinc-200 rounded-lg text-zinc-700 font-medium transition-all border border-zinc-300 w-full sm:w-auto">Cancelar</button>
+          <button id="confirm-delete" class="px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-lg text-white font-medium transition-all shadow-sm w-full sm:w-auto">Excluir</button>
         </div>
       </div>
     `;
@@ -261,10 +274,10 @@ export default function Admin() {
         document.body.removeChild(modalOverlay);
         
         try {
-          // Importa a função de remover agendamento
-          const { removeAppointment } = await import('../lib/appointments');
+          // Importa a função de remover agendamento diretamente do database
+          const { removeAppointment } = await import('../lib/database');
           
-          // Remove o agendamento usando o novo sistema
+          // Remove o agendamento usando o sistema direto
           const success = await removeAppointment(appointment.id);
           
           if (success) {
@@ -279,10 +292,45 @@ export default function Admin() {
             
             // Recarrega os dados dos clientes mensais
             loadMonthlyClients();
+          } else {
+            // Tenta remover diretamente do localStorage como fallback
+            try {
+              const localAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+              const updatedAppointments = localAppointments.filter(app => app.id !== appointment.id);
+              localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+              
+              // Atualiza a lista local
+              const updatedAppointmentsList = [...appointments];
+              updatedAppointmentsList.splice(index, 1);
+              setAppointments(updatedAppointmentsList);
+              
+              setMessage('Agendamento excluído com sucesso (modo offline).');
+              loadMonthlyClients();
+            } catch (e) {
+              console.error('Erro ao excluir agendamento do localStorage:', e);
+              setMessage('Erro ao excluir agendamento. Tente novamente.');
+            }
           }
         } catch (error) {
           console.error('Erro ao excluir agendamento:', error);
-          setMessage('Erro ao excluir agendamento. Tente novamente.');
+          
+          // Tenta remover diretamente do localStorage como fallback
+          try {
+            const localAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+            const updatedAppointments = localAppointments.filter(app => app.id !== appointment.id);
+            localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+            
+            // Atualiza a lista local
+            const updatedAppointmentsList = [...appointments];
+            updatedAppointmentsList.splice(index, 1);
+            setAppointments(updatedAppointmentsList);
+            
+            setMessage('Agendamento excluído com sucesso (modo offline).');
+            loadMonthlyClients();
+          } catch (e) {
+            console.error('Erro ao excluir agendamento do localStorage:', e);
+            setMessage('Erro ao excluir agendamento. Tente novamente.');
+          }
         }
         
         resolve(true);
@@ -357,15 +405,15 @@ export default function Admin() {
   }
 
   return (
-    <section className="w-full py-12 bg-gradient-to-b from-white to-zinc-100 min-h-screen">
-      <div className="container px-4 mx-auto">
+    <section className="w-full py-6 sm:py-12 bg-gradient-to-b from-white to-zinc-100 min-h-screen">
+      <div className="container px-2 sm:px-4 mx-auto">
         <Card>
-          <CardHeader className="admin-header">
-            <CardTitle className="admin-title">Painel Administrativo</CardTitle>
+          <CardHeader className="flex flex-col sm:flex-row justify-between items-center p-4 sm:p-6">
+            <CardTitle className="text-xl sm:text-2xl font-bold mb-4 sm:mb-0">Painel Administrativo</CardTitle>
             <Button 
               variant="secondary" 
               onClick={handleLogout}
-              className="px-6 flex items-center gap-2 hover:shadow-lg transition-all bg-white text-amber-600 hover:bg-zinc-50"
+              className="px-4 sm:px-6 py-2 flex items-center gap-2 hover:shadow-lg transition-all bg-white text-amber-600 hover:bg-zinc-50"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm7 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm1 4a1 1 0 102 0V7a1 1 0 10-2 0v4z" clipRule="evenodd" />
@@ -375,38 +423,38 @@ export default function Admin() {
           </CardHeader>
           
           <div className="bg-gradient-to-r from-zinc-50 to-amber-50 border-b border-amber-200 shadow-sm">
-            <div className="flex overflow-x-auto">
+            <div className="flex flex-wrap justify-center sm:justify-start overflow-x-auto">
               <button
-                className={`admin-tab ${activeTab === 'appointments' ? 'admin-tab-active' : 'admin-tab-inactive'}`}
+                className={`admin-tab flex-1 sm:flex-none ${activeTab === 'appointments' ? 'admin-tab-active' : 'admin-tab-inactive'}`}
                 onClick={() => setActiveTab('appointments')}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
                   </svg>
-                  Agendamentos
+                  <span className="whitespace-nowrap">Agendamentos</span>
                 </div>
               </button>
               <button
-                className={`admin-tab ${activeTab === 'monthly' ? 'admin-tab-active' : 'admin-tab-inactive'}`}
+                className={`admin-tab flex-1 sm:flex-none ${activeTab === 'monthly' ? 'admin-tab-active' : 'admin-tab-inactive'}`}
                 onClick={() => setActiveTab('monthly')}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
                   </svg>
-                  Planos Mensais
+                  <span className="whitespace-nowrap">Planos Mensais</span>
                 </div>
               </button>
               <button
-                className={`admin-tab ${activeTab === 'settings' ? 'admin-tab-active' : 'admin-tab-inactive'}`}
+                className={`admin-tab flex-1 sm:flex-none ${activeTab === 'settings' ? 'admin-tab-active' : 'admin-tab-inactive'}`}
                 onClick={() => setActiveTab('settings')}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                   </svg>
-                  Configurações
+                  <span className="whitespace-nowrap">Configurações</span>
                 </div>
               </button>
             </div>
@@ -431,7 +479,7 @@ export default function Admin() {
                     <table className="admin-table">
                       <thead className="admin-table-header">
                         <tr>
-                          <th className="admin-table-header-cell">Cliente</th>
+                          <th className="admin-table-header-cell">Cliente/Contato</th>
                           <th className="admin-table-header-cell">Serviço</th>
                           <th className="admin-table-header-cell">Data</th>
                           <th className="admin-table-header-cell">Horário</th>
@@ -444,6 +492,21 @@ export default function Admin() {
                           <tr key={index} className="admin-table-row">
                             <td className="admin-table-cell">
                               <div className="font-medium text-zinc-900">{appointment.name}</div>
+                              {appointment.phone && (
+                                <div className="flex items-center mt-1">
+                                  <a 
+                                    href={`https://wa.me/55${appointment.phone.replace(/\D/g, '')}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-green-600 hover:text-green-800 flex items-center text-sm bg-green-50 px-2 py-1 rounded-md border border-green-200 hover:bg-green-100 transition-colors"
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                                    </svg>
+                                    Contato WhatsApp
+                                  </a>
+                                </div>
+                              )}
                             </td>
                             <td className="admin-table-cell">
                               <div className="text-zinc-900">{appointment.service}</div>
@@ -463,15 +526,31 @@ export default function Admin() {
                               )}
                             </td>
                             <td className="admin-table-cell text-right">
-                              <button 
-                                className="btn-danger inline-flex items-center"
-                                onClick={() => deleteAppointment(index)}
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                                </svg>
-                                Excluir
-                              </button>
+                              <div className="flex justify-end gap-2">
+                                {appointment.phone && (
+                                  <a 
+                                    href={`https://wa.me/55${appointment.phone.replace(/\D/g, '')}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn-whatsapp inline-flex items-center"
+                                    title="Contato via WhatsApp"
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                                    </svg>
+                                    WhatsApp
+                                  </a>
+                                )}
+                                <button 
+                                  className="btn-danger inline-flex items-center"
+                                  onClick={() => deleteAppointment(index)}
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                  </svg>
+                                  Excluir
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -496,13 +575,13 @@ export default function Admin() {
                     <p className="text-zinc-500 italic">Nenhum cliente com plano mensal encontrado.</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {monthlyClients.map((client, index) => (
                       <Card key={index} className="overflow-hidden">
-                        <CardHeader className="bg-amber-50 border-b border-amber-100">
-                          <CardTitle className="text-lg">{client.name}</CardTitle>
+                        <CardHeader className="bg-amber-50 border-b border-amber-100 p-3 sm:p-4">
+                          <CardTitle className="text-base sm:text-lg">{client.name}</CardTitle>
                         </CardHeader>
-                        <CardContent className="p-4">
+                        <CardContent className="p-3 sm:p-4">
                           <div className="space-y-3">
                             <div className="flex justify-between items-center">
                               <span className="text-zinc-600">Cortes utilizados:</span>
@@ -525,23 +604,134 @@ export default function Admin() {
                             
                             <div className="text-sm text-zinc-500 pt-2 border-t border-zinc-100">
                               Mês de referência: {new Date(0, client.month).toLocaleString('pt-BR', { month: 'long' })} / {client.year}
+                              {client.firstAppointmentDate && (
+                                <div className="mt-1 text-xs text-zinc-500">
+                                  Primeiro agendamento: {new Date(client.firstAppointmentDate).toLocaleDateString('pt-BR')}
+                                </div>
+                              )}
+                              {client.daysLeft > 0 && (
+                                <div className="mt-1 flex items-center">
+                                  <div className="w-4 h-4 mr-1 text-amber-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                                    </svg>
+                                  </div>
+                                  <span className="text-amber-600 font-medium">{client.daysLeft} {client.daysLeft === 1 ? 'dia restante' : 'dias restantes'} no plano</span>
+                                </div>
+                              )}
+                              {client.firstAppointmentDate && (
+                                <div className="mt-1 text-xs text-zinc-500">
+                                  Validade: {(() => {
+                                    const firstDate = new Date(client.firstAppointmentDate);
+                                    const expiryDate = new Date(firstDate);
+                                    expiryDate.setDate(firstDate.getDate() + 30);
+                                    return expiryDate.toLocaleDateString('pt-BR');
+                                  })()}
+                                </div>
+                              )}
                             </div>
                             
-                            {client.appointments && client.appointments.length > 0 && (
-                              <div className="mt-3 pt-2 border-t border-zinc-100">
-                                <p className="font-medium text-zinc-700 mb-2">Agendamentos do mês:</p>
-                                <div className="space-y-2 max-h-40 overflow-y-auto">
-                                  {client.appointments.map((app, i) => (
+                            <div className="mt-3 pt-2 border-t border-zinc-100">
+                              <p className="font-medium text-zinc-700 mb-2">Histórico de agendamentos:</p>
+                              <div className="space-y-2 max-h-40 overflow-y-auto">
+                                {client.appointments && client.appointments.length > 0 ? (
+                                  client.appointments.map((app, i) => (
                                     <div key={i} className="text-sm bg-zinc-50 p-2 rounded border border-zinc-200">
-                                      <div className="font-medium">{app.service}</div>
+                                      <div className="flex justify-between items-center">
+                                        <div className="font-medium">{app.service}</div>
+                                        <button 
+                                          onClick={() => {
+                                            // Criar modal de confirmação
+                                            const modalOverlay = document.createElement('div');
+                                            modalOverlay.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm';
+                                            
+                                            // Conteúdo do modal
+                                            modalOverlay.innerHTML = `
+                                              <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border-t-4 border-amber-500 animate-fadeIn">
+                                                <div class="flex items-center mb-4 text-amber-600">
+                                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                  </svg>
+                                                  <h3 class="text-xl font-bold">Confirmar exclusão</h3>
+                                                </div>
+                                                
+                                                <p class="text-zinc-700 mb-4 font-medium">Tem certeza que deseja excluir este agendamento?</p>
+                                                
+                                                <div class="mb-5 p-4 bg-gradient-to-r from-amber-50 to-zinc-50 border border-amber-200 rounded-lg shadow-sm">
+                                                  <div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
+                                                    <span class="text-zinc-500 font-medium">Cliente:</span>
+                                                    <span class="text-zinc-800 font-semibold">${client.name}</span>
+                                                    
+                                                    <span class="text-zinc-500 font-medium">Serviço:</span>
+                                                    <span class="text-zinc-800">${app.service}</span>
+                                                    
+                                                    <span class="text-zinc-500 font-medium">Data:</span>
+                                                    <span class="text-zinc-800">${new Date(app.date).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                                    
+                                                    <span class="text-zinc-500 font-medium">Horário:</span>
+                                                    <span class="text-zinc-800">${app.time}</span>
+                                                  </div>
+                                                  
+                                                  <div class="mt-3 pt-3 border-t border-amber-200">
+                                                    <div class="flex items-center text-green-600">
+                                                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                                                      </svg>
+                                                      <p class="font-medium">Este agendamento é de um plano mensal.</p>
+                                                    </div>
+                                                    <p class="text-green-600 ml-7">Ao excluir, o cliente ganhará +1 agendamento disponível.</p>
+                                                    <p class="text-amber-600 font-medium mt-2 ml-7">O histórico deste agendamento também será removido.</p>
+                                                  </div>
+                                                </div>
+                                                
+                                                <div class="flex flex-col sm:flex-row justify-end gap-3">
+                                                  <button id="cancel-delete-history" class="px-5 py-2.5 bg-zinc-100 hover:bg-zinc-200 rounded-lg text-zinc-700 font-medium transition-all border border-zinc-300 w-full sm:w-auto">Cancelar</button>
+                                                  <button id="confirm-delete-history" class="px-5 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-lg text-white font-medium transition-all shadow-sm w-full sm:w-auto">Excluir</button>
+                                                </div>
+                                              </div>
+                                            `;
+                                            
+                                            // Adiciona o modal ao DOM
+                                            document.body.appendChild(modalOverlay);
+                                            
+                                            // Adiciona event listeners aos botões
+                                            document.getElementById('cancel-delete-history').addEventListener('click', () => {
+                                              document.body.removeChild(modalOverlay);
+                                            });
+                                            
+                                            document.getElementById('confirm-delete-history').addEventListener('click', async () => {
+                                              document.body.removeChild(modalOverlay);
+                                              
+                                              try {
+                                                const { removeAppointment } = await import('../lib/database');
+                                                await removeAppointment(app.id);
+                                                loadMonthlyClients(); // Recarregar dados após exclusão
+                                                loadAppointments(); // Atualizar lista de agendamentos
+                                                setMessage('Agendamento excluído com sucesso e +1 agendamento adicionado ao plano do cliente.');
+                                              } catch (error) {
+                                                console.error('Erro ao excluir agendamento:', error);
+                                                setMessage('Erro ao excluir agendamento. Tente novamente.');
+                                              }
+                                            });
+                                          }}
+                                          className="text-red-400 hover:text-red-600 p-1 rounded-full hover:bg-white transition-colors"
+                                          title="Excluir agendamento"
+                                        >
+                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                          </svg>
+                                        </button>
+                                      </div>
                                       <div className="text-zinc-500">
                                         {new Date(app.date).toLocaleDateString('pt-BR')} às {app.time}
                                       </div>
                                     </div>
-                                  ))}
-                                </div>
+                                  ))
+                                ) : (
+                                  <div className="text-sm text-zinc-500 italic">Nenhum agendamento registrado</div>
+                                )}
                               </div>
-                            )}
+                            </div>
                             
                             {client.history && client.history.length > 0 && (
                               <div className="mt-3 pt-2 border-t border-zinc-100">
@@ -591,7 +781,7 @@ export default function Admin() {
                   Configurações
                 </h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <Card>
                     <CardHeader>
                       <CardTitle>Dias de Funcionamento</CardTitle>
@@ -601,7 +791,7 @@ export default function Admin() {
                         {Object.keys(workingDays).map((day) => (
                           <div 
                             key={day} 
-                            className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                            className={`p-3 sm:p-4 rounded-lg border cursor-pointer transition-all ${
                               workingDays[day] 
                                 ? 'bg-amber-50 border-amber-200 text-amber-800 shadow-sm' 
                                 : 'bg-zinc-50 border-zinc-200 text-zinc-500'
@@ -623,7 +813,7 @@ export default function Admin() {
                                     </svg>
                                   )}
                                 </div>
-                                <span className="font-medium text-lg">{getDayName(day)}</span>
+                                <span className="font-medium text-base sm:text-lg">{getDayName(day)}</span>
                               </div>
                               <span className="text-sm">
                                 {workingDays[day] ? 'Aberto' : 'Fechado'}
@@ -641,7 +831,7 @@ export default function Admin() {
                     </CardHeader>
                     <CardContent>
                       <div className="mb-4">
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <Input
                             type="text"
                             value={newTimeSlot}
@@ -649,7 +839,7 @@ export default function Admin() {
                             placeholder="Ex: 14:30"
                             className="flex-1"
                           />
-                          <Button onClick={addTimeSlot}>Adicionar</Button>
+                          <Button onClick={addTimeSlot} className="w-full sm:w-auto">Adicionar</Button>
                         </div>
                         {message && message.includes('horário') && (
                           <p className="mt-2 text-sm text-red-600">{message}</p>
@@ -660,9 +850,9 @@ export default function Admin() {
                         {timeSlots.sort().map((slot) => (
                           <div 
                             key={slot} 
-                            className="flex items-center justify-between bg-amber-50 border border-amber-100 rounded-lg px-4 py-2 hover:shadow-sm transition-all"
+                            className="flex items-center justify-between bg-amber-50 border border-amber-100 rounded-lg px-2 sm:px-4 py-2 hover:shadow-sm transition-all"
                           >
-                            <span className="font-medium text-amber-800">{slot}</span>
+                            <span className="font-medium text-amber-800 text-sm sm:text-base">{slot}</span>
                             <button 
                               onClick={() => removeTimeSlot(slot)}
                               className="text-amber-400 hover:text-red-600 p-1 rounded-full hover:bg-white transition-colors"
