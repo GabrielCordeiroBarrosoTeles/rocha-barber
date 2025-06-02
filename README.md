@@ -137,7 +137,11 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
   * Headers de cache otimizados (assets imutáveis com cache longo)
   * Configuração correta para o framework Vite
 
-* O arquivo `vite.config.js` está configurado sem base path para funcionar corretamente na Vercel
+* O arquivo `vite.config.js` está configurado com:
+  * Base path configurado como '/' para compatibilidade com Vercel
+  * Source maps habilitados para melhor depuração
+  * Otimização de bundle com Terser
+  * Resolução de duplicações para evitar conflitos
 
 * O arquivo `.vercelignore` exclui arquivos desnecessários do deploy
 
@@ -148,6 +152,14 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
 * Tratamento de erros robusto para evitar falhas silenciosas
 * Redirecionamento de rotas não encontradas para a página inicial
 
+### Sistema de Tratamento de Erros:
+
+* **Fallback HTML** para erros de renderização no `main.jsx`
+* **Detecção de falhas** de carregamento após 5 segundos no `index.html`
+* **Mensagem amigável** para o usuário em caso de falha
+* **Source maps** habilitados para melhor depuração em produção
+* **Try/catch** em pontos críticos da aplicação para evitar quebras
+
 ### Navegação e Redirecionamentos:
 
 * Links de navegação (Início, Serviços, Sobre, Contato) utilizam JavaScript para rolagem suave até as seções
@@ -155,6 +167,14 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
 * Cards de serviço redirecionam para a página de agendamento
 * Implementação de tratamento de erros para evitar tela branca em produção
 * Correção de importações e exportações para garantir compatibilidade com o build
+
+### Prevenção de Tela Branca:
+
+* **Encapsulamento** da renderização em função com try/catch
+* **Fallback visual** em HTML puro caso React falhe ao renderizar
+* **Timeout de detecção** para identificar falhas de carregamento
+* **Botão de recarga** para permitir que o usuário tente novamente
+* **Mensagens de erro** amigáveis e instruções claras para o usuário
 
 Após o deploy, seu sistema estará ativo com domínio próprio da Vercel.
 
