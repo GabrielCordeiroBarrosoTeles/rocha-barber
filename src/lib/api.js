@@ -5,7 +5,6 @@ import {
   getTimeSlots, 
   updateTimeSlots, 
   exportAllData, 
-  migrateLocalDataToSupabase,
   importData
 } from './database';
 
@@ -38,10 +37,6 @@ export async function initializeDatabase() {
     // Inicializa os horários
     await updateTimeSlots(defaultTimeSlots);
     
-    // Tenta migrar dados locais para o Supabase (se existirem)
-    if (typeof window !== 'undefined') {
-      await migrateLocalDataToSupabase();
-    }
   } catch (error) {
     console.error('Erro ao inicializar banco de dados:', error);
   }
