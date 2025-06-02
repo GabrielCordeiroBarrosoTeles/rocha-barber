@@ -18,7 +18,7 @@ export default function Hero() {
       
       <div className="container px-4 py-20 mx-auto flex flex-col items-center text-center md:py-32 relative z-20">
         <div className="w-48 h-48 relative mb-6 animate-fade-in">
-          <img src="./images/logo.png" alt="Rocha Barber Logo" className="object-contain w-full h-full drop-shadow-lg" />
+          <img src="/images/logo.png" alt="Rocha Barber Logo" className="object-contain w-full h-full drop-shadow-lg" />
         </div>
         <h1 className="text-4xl font-bold tracking-tight md:text-6xl mb-2 drop-shadow-lg">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-600">
@@ -30,7 +30,11 @@ export default function Hero() {
         </p>
         <div className="mt-8 space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
           <a
-            href="#servicos"
+            href="/#/" 
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('servicos')?.scrollIntoView({behavior: 'smooth'});
+            }}
             className="block sm:inline-block transform hover:scale-105 transition-transform duration-300"
           >
             <Button variant="gradient" className="w-full sm:w-auto text-lg px-8 py-3 h-auto">
@@ -38,7 +42,11 @@ export default function Hero() {
             </Button>
           </a>
           <a
-            href="#servicos"
+            href="/#/" 
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('sobre')?.scrollIntoView({behavior: 'smooth'});
+            }}
             className="block sm:inline-block transform hover:scale-105 transition-transform duration-300"
           >
             <Button variant="outline" className="w-full sm:w-auto text-lg px-8 py-3 h-auto bg-zinc-800/50 text-white border-zinc-600 hover:bg-zinc-700">

@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import App from './App.jsx'
 import './index.css'
 import Agendamento from './components/Agendamento.jsx'
@@ -9,21 +9,32 @@ import Admin from './components/Admin.jsx'
 // Renderiza a aplicação primeiro
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/agendamento" element={<Agendamento />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   </React.StrictMode>,
 )
 
 // Inicializa o banco de dados em segundo plano
 setTimeout(() => {
-  import('./lib/api.js').then(({ initializeDatabase }) => {
-    initializeDatabase().catch(error => {
-      console.error('Erro ao inicializar banco de dados:', error);
+  try {
+    import('./lib/api.js').then(({ initializeDatabase }) => {
+      if (typeof initializeDatabase === 'function') {
+        initializeDatabase().catch(error => {
+          console.error('Erro ao inicializar banco de dados:', error);
+        });
+      } else {
+        console.warn('Função initializeDatabase não encontrada');
+      }
+    }).catch(error => {
+      console.error('Erro ao importar api.js:', error);
     });
-  });
+  } catch (error) {
+    console.error('Erro ao carregar módulo api:', error);
+  }
 }, 1000);
