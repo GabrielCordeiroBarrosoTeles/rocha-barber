@@ -1,14 +1,19 @@
-import { defineConfig } from "vite"
-import react from "@vitejs/plugin-react"
-import path from "path"
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
+  build: {
+    // Gera source maps para melhor depuração
+    sourcemap: true,
+    // Otimiza o tamanho do bundle usando o minificador padrão (esbuild)
+    minify: 'esbuild'
   },
-  // Removendo o base path para funcionar corretamente na Vercel
+  // Configuração para garantir que os assets sejam carregados corretamente
+  base: '/',
+  // Configuração para lidar com erros de importação
+  resolve: {
+    dedupe: ['react', 'react-dom']
+  }
 })

@@ -26,9 +26,58 @@
     <meta property="twitter:title" content="Rocha Barber - Barbearia de Estilo">
     <meta property="twitter:description" content="Cortes de cabelo e barba com estilo e qualidade. Agende seu horário na Rocha Barber.">
     <meta property="twitter:image" content="/images/barbershop.png">
+    
+    <!-- Fallback para caso o JavaScript falhe -->
+    <style>
+      .js-error-fallback {
+        display: none;
+        padding: 20px;
+        text-align: center;
+        font-family: 'Inter', sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        margin-top: 100px;
+      }
+      .js-error-fallback h1 {
+        color: #d97706;
+        margin-bottom: 20px;
+      }
+      .js-error-fallback p {
+        margin-bottom: 20px;
+        color: #333;
+      }
+      .js-error-fallback button {
+        background: linear-gradient(to right, #d97706, #b45309);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- Fallback para erros de JavaScript -->
+    <div class="js-error-fallback" id="js-error">
+      <h1>Não foi possível carregar a aplicação</h1>
+      <p>Ocorreu um erro ao carregar a Rocha Barber. Por favor, tente novamente ou entre em contato conosco.</p>
+      <button onclick="window.location.reload()">Tentar novamente</button>
+    </div>
+    
+    <script>
+      // Detecta se o JavaScript está habilitado e se a aplicação não carregou após um tempo
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          if (document.getElementById('root').children.length === 0) {
+            document.getElementById('js-error').style.display = 'block';
+          }
+        }, 5000); // Espera 5 segundos
+      });
+    </script>
+    
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
