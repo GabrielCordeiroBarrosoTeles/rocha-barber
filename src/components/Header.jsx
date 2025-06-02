@@ -5,7 +5,6 @@ import { Link } from "react-router-dom"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const whatsappNumber = "558596988973"
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
