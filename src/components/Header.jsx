@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { Menu, X } from "./icons"
 import { Button } from "./ui/button"
-import { Link } from "react-router-dom"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -14,12 +13,12 @@ export default function Header() {
     <header className="w-full bg-gradient-to-r from-zinc-900 to-zinc-800 text-white sticky top-0 z-50 shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center group">
+          <a href="/" className="flex items-center group">
             <div className="relative w-10 h-10 mr-2 transform group-hover:scale-110 transition-transform duration-300">
               <img src="/images/logo.png" alt="Rocha Barber Logo" className="object-contain w-full h-full" />
             </div>
             <span className="font-bold text-xl group-hover:text-amber-400 transition-colors">Rocha Barber</span>
-          </Link>
+          </a>
 
           {/* Mobile menu button */}
           <button 
