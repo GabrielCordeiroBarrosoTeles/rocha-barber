@@ -1,0 +1,42 @@
+/* Estilos para modais */
+.fixed.inset-0 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.fixed.inset-0 > div {
+  width: auto;
+  max-width: 450px;
+  min-width: 300px;
+  margin: 0 auto;
+  max-height: fit-content;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Conteúdo do modal */
+.modal-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+}
+
+/* Estilo específico para modal de confirmação */
+.confirmation-modal {
+  height: auto !important;
+  align-self: flex-start;
+  width: 100%;
+}
+
+/* Ajustes para dispositivos móveis */
+@media (max-width: 640px) {
+  .fixed.inset-0 > div {
+    width: 90%;
+    max-height: 85vh;
+    margin: 0 auto;
+  }
+}

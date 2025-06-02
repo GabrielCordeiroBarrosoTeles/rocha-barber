@@ -1,86 +1,93 @@
-"use client"
+import React from 'react';
+import './ServiceCard.css';
 
-import { Button } from "./ui/button"
-
-export default function ServiceCard({
-  title,
-  description,
-  price,
-  imageSrc,
-  featured = false,
-  benefits = [],
-  whatsappNumber,
-  additionalInfo = "",
+export default function ServiceCard({ 
+  title, 
+  description, 
+  price, 
+  imageSrc, 
+  additionalInfo, 
+  benefits = [], 
+  featured = false 
 }) {
-  const handleSchedule = () => {
-    const message = `Olá! Gostaria de agendar um ${title} por ${price}.`
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, "_blank")
-  }
+  console.log('Renderizando card com imagem:', imageSrc);
+  const handleClick = () => {
+    // Salva o serviço selecionado no localStorage
+    const serviceData = {
+      title,
+      price,
+      description
+    };
+    
+    localStorage.setItem('selectedService', JSON.stringify(serviceData));
+    console.log('Serviço salvo no localStorage:', serviceData);
+    
+    // Navega para a página de agendamento
+    window.location.href = '/agendamento';
+  };
 
   return (
-    <div
-      className={`overflow-hidden rounded-lg shadow-lg h-full flex flex-col ${
-        featured 
-          ? "border-2 border-amber-600 bg-gradient-to-br from-zinc-50 to-amber-50" 
-          : "border border-zinc-200 hover:border-amber-600 bg-white"
+    <div 
+      className={`bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl ${
+        featured ? 'border-2 border-amber-500 transform hover:-translate-y-2 featured-card' : 'hover:-translate-y-1'
       }`}
     >
-      <div className="relative w-full h-48 overflow-hidden">
-        <img
-          src={imageSrc || "./placeholder.svg"}
-          alt={title}
-          className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
+      {/* Imagem do serviço */}
+      <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden service-card-image">
+        <img 
+          src={imageSrc || `/images/${title.toLowerCase().replace(/\s+/g, '-')}.png`} 
+          alt={title} 
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            console.error(`Erro ao carregar imagem: ${e.target.src}`);
+            e.target.src = '/images/barbershop.png'; // Imagem de fallback
+          }}
         />
         {featured && (
-          <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-amber-700 text-white px-3 py-1 text-sm font-semibold rounded-bl-lg shadow-md">
+          <div className="absolute top-0 right-0 bg-amber-500 text-white px-4 py-1 rounded-bl-lg font-medium featured-badge">
             Mais Popular
           </div>
         )}
       </div>
       
-      <div className={`p-5 ${featured ? "bg-gradient-to-r from-amber-600 to-amber-700" : ""}`}>
-        <h3 className={`text-xl font-bold ${featured ? "text-white" : "text-zinc-900"}`}>{title}</h3>
-        <p className={`text-sm ${featured ? "text-amber-100" : "text-zinc-600"}`}>{description}</p>
-      </div>
-      
-      <div className="p-5 pt-6 flex-grow">
-        <p className="text-3xl font-bold text-amber-600">{price}</p>
-        {additionalInfo && (
-          <p className="mt-3 text-zinc-700 italic">{additionalInfo}</p>
-        )}
-        {benefits.length > 0 && (
-          <ul className="mt-4 space-y-2">
+      {/* Conteúdo do card */}
+      <div className="p-5 service-card-content">
+        <div>
+          <h3 className="text-xl font-bold text-zinc-900 service-card-title">{title}</h3>
+          <p className="text-zinc-600 mb-2 service-card-description">{description}</p>
+          
+          <p className="text-2xl font-bold text-amber-600 mb-3 service-card-price">{price}</p>
+          
+          <p className="text-zinc-700 mb-4 text-sm service-card-info">{additionalInfo}</p>
+          
+          {/* Lista de benefícios */}
+          <ul className="space-y-2 mb-5 service-benefits">
             {benefits.map((benefit, index) => (
-              <li key={index} className="flex items-center">
-                <svg className="h-5 w-5 text-amber-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <li key={index} className="flex items-start">
+                <svg className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span className="text-zinc-800">{benefit}</span>
+                <span className="text-zinc-700 text-sm">{benefit}</span>
               </li>
             ))}
           </ul>
-        )}
+        </div>
         
-        {/* Versículo bíblico ou mensagem inspiradora */}
-        <div className="mt-4 pt-4 border-t border-zinc-200">
-          <p className="text-xs text-center text-zinc-500 italic">
-            {featured ? 
-              '"Tudo posso naquele que me fortalece." - Filipenses 4:13' : 
-              '"Porque o Senhor dá a sabedoria." - Provérbios 2:6'}
+        <div className="mt-auto">
+          {/* Versículo */}
+          <p className="text-xs text-zinc-500 italic mb-5 service-card-verse text-center">
+            "Porque o Senhor dá a sabedoria." - Provérbios 2:6
           </p>
+          
+          {/* Botão de agendamento */}
+          <button 
+            onClick={handleClick}
+            className="w-full py-3 rounded-lg font-bold text-white transition-all service-card-button bg-gradient-to-r from-amber-600 to-amber-800 hover:from-amber-700 hover:to-amber-900 shadow-md"
+          >
+            Agendar Agora
+          </button>
         </div>
       </div>
-      
-      <div className="p-5 mt-auto">
-        <Button 
-          variant={featured ? "gradient" : "primary"} 
-          className={`w-full ${featured ? "py-3 text-lg" : ""}`} 
-          onClick={handleSchedule}
-        >
-          Agendar Agora
-        </Button>
-      </div>
     </div>
-  )
+  );
 }

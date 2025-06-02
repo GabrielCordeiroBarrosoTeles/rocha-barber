@@ -1,166 +1,242 @@
-# Rocha Barber - Site Institucional
+# ✂️ Rocha Barber - Sistema de Agendamentos Inteligente
 
-![Rocha Barber Logo](./public/images/logo.png)
-
-<!-- Header Image -->
-
-![Header](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/header.png)
-
-## 📋 Visão Geral
-
-Este é um site institucional responsivo para a barbearia Rocha Barber, desenvolvido com React e Vite. O site segue o conceito de Mobile First, garantindo uma experiência otimizada em dispositivos móveis e desktops.
-
-## 🚀 Instalação e Execução
-
-### Pré-requisitos
-
-* Node.js 18.17.0 ou superior
-* npm ou yarn
-
-### Passo 1: Clonar o repositório
-
-```bash
-git clone https://github.com/GabrielCordeiroBarrosoTeles/rocha-barber.git
-cd rocha-barber
-```
-
-### Passo 2: Instalar dependências
-
-```bash
-npm install
-```
-
-### Passo 3: Executar o projeto em ambiente de desenvolvimento
-
-```bash
-npm run dev
-```
-
-O site estará disponível em `http://localhost:5173`.
-
-## 🛠️ Tecnologias Utilizadas
-
-* **React**: Biblioteca JavaScript para construção de interfaces
-* **Vite**: Build tool e servidor de desenvolvimento
-* **Tailwind CSS**: Framework CSS para design responsivo
-* **React Icons**: Biblioteca de ícones para React
-
-## 📱 Recursos e Funcionalidades
-
-### Seção de Serviços
-
-<!-- Card Services Image -->
-
-![Serviços](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/cardServices.png)
-
-* **Design Responsivo**: Adaptação perfeita para todos os tamanhos de tela
-* **Seção de Serviços**: Apresentação dos serviços oferecidos pela barbearia
-* **Galeria de Fotos**: Mostra do ambiente e trabalhos realizados
-* **Formulário de Contato**: Facilidade para clientes entrarem em contato
-* **Depoimentos**: Feedback de clientes satisfeitos
-* **Informações de Localização**: Endereço e mapa para fácil localização
-
-### Sobre Mim
-
-<!-- About Me Image -->
-
-![Sobre Mim](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/aboutMe.png)
-
-Aqui você encontra nossa história, missão e valores.
-
-### Depoimentos
-
-<!-- Feedback Image -->
-
-![Depoimentos](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/feedback.png)
-
-Nossos clientes satisfeitos compartilham suas experiências.
-
-## 📤 Deploy na Vercel
-
-### Método Automático (Recomendado)
-
-1. Faça um fork deste repositório ou crie um novo repositório no GitHub
-2. Clone o repositório para sua máquina local
-3. Faça suas alterações
-4. Commit e push para o repositório remoto
-5. O GitHub Actions automaticamente fará o deploy para o GitHub Pages
-
-### Método Manual
-
-#### Passo 1: Configurar o arquivo vite.config.js
-
-O arquivo já está configurado com `base: "/rocha-barber/"` para funcionar com GitHub Pages.
-
-#### Passo 2: Criar um repositório no GitHub
-
-Crie um novo repositório no GitHub com o nome "rocha-barber".
-
-#### Passo 3: Inicializar Git e fazer o primeiro commit
-
-```bash
-git init
-git add .
-git commit -m "Primeiro commit"
-git branch -M main
-git remote add origin https://github.com/GabrielCordeiroBarrosoTeles/rocha-barber.git
-git push -u origin main
-```
-
-#### Passo 4: Deploy para GitHub Pages
-
-```bash
-npm run deploy
-```
-
-Isso irá construir o projeto e publicá-lo na branch gh-pages do seu repositório.
-
-#### Passo 5: Configurar GitHub Pages
-
-1. Vá para as configurações do seu repositório no GitHub
-2. Navegue até a seção "Pages"
-3. Selecione a branch "gh-pages" como fonte
-4. Clique em "Save"
-
-Seu site estará disponível em `https://GabrielCordeiroBarrosoTeles.github.io/rocha-barber/`
-
-## 🧩 Estrutura do Projeto
-
-```
-rocha-barber/
-├── public/
-│   └── images/         # Imagens estáticas
-│       └── header.png
-│       └── cardServices.png
-│       └── aboutMe.png
-│       └── feedback.png
-│       └── footer.png
-├── src/
-│   ├── components/     # Componentes React
-│   │   ├── ui/         # Componentes de UI reutilizáveis
-│   │   └── ...         # Outros componentes específicos
-│   ├── lib/            # Funções utilitárias
-│   ├── App.jsx         # Componente principal
-│   ├── index.css       # Estilos globais
-│   └── main.jsx        # Ponto de entrada
-├── index.html          # Template HTML
-├── package.json        # Dependências e scripts
-├── vite.config.js      # Configuração do Vite
-└── README.md           # Documentação
-```
-
-<!-- Footer Image -->
-
-![Footer](https://raw.githubusercontent.com/GabrielCordeiroBarrosoTeles/Imgs_repositorios/main/rocha-barber/footer.png)
-
-## 📝 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## 👨‍💻 Autor
-
-Desenvolvido por [Gabriel Cordeiro](https://github.com/GabrielCordeiroBarrosoTeles)
+Um sistema completo para barbearias que desejam elevar sua organização, atendimento e fidelização de clientes com planos mensais e gestão facilitada.
 
 ---
 
-© 2023 Rocha Barber. Todos os direitos reservados.
+## 📌 Visão Geral
+
+O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online, pensada para facilitar o dia a dia da barbearia, melhorar a experiência dos clientes e oferecer um painel administrativo completo.
+
+### 🔑 Principais Recursos
+
+* Agendamento de serviços online
+* Planos mensais com controle de uso
+* Gerenciamento de dias e horários de funcionamento
+* Painel administrativo seguro
+* Interface responsiva (mobile-first)
+
+---
+
+## ⚙️ Funcionalidades Detalhadas
+
+### 🗓️ Agendamento de Serviços
+
+* Escolha do serviço desejado
+* Seleção de data e horário disponíveis
+* Verificação automática de disponibilidade
+* Suporte a planos mensais e agendamentos avulsos
+* Interface intuitiva e adaptável a todos os dispositivos
+
+### 💈 Planos Mensais
+
+* Assinatura com **4 cortes mensais** por R\$ 120,00
+* Renovação automática ao fim de cada mês
+* Histórico de uso por até **12 meses**
+* Visualização clara dos cortes disponíveis e utilizados
+* **Atenção**: o nome usado nos agendamentos deve ser digitado exatamente igual para que o sistema reconheça o plano
+
+### 📊 Painel Administrativo
+
+* Gerenciamento completo dos agendamentos
+* Configuração de dias e horários de funcionamento
+* Monitoramento do uso dos planos mensais
+* Exportação e importação de dados
+* Autenticação segura de administradores
+
+---
+
+## 🧠 Armazenamento de Dados
+
+### localStorage (uso principal)
+
+* `appointments`: agendamentos
+* `clientPlans`: planos ativos
+* `workingDays`: dias disponíveis
+* `timeSlots`: horários liberados
+
+### IndexedDB (backup persistente)
+
+* Banco de dados: `barberShopDB`
+* Store: `data`
+* Chaves utilizadas: `appointments`, `clientPlans`, `workingDays`, `timeSlots`
+
+---
+
+## 💻 Tecnologias Utilizadas
+
+* **Frontend**: React + Vite
+* **Estilização**: TailwindCSS
+* **Armazenamento**: localStorage + IndexedDB
+* **Deploy**: Vercel
+
+---
+
+## 🚀 Melhorias Implementadas
+
+### ✅ Verificação de Disponibilidade
+
+* Filtro automático por dias de funcionamento
+* Alertas claros para datas indisponíveis
+
+### 📅 Organização de Horários
+
+* Exibição ordenada dos horários disponíveis
+* Interface clean e intuitiva
+
+### 🧼 Modal de Exclusão
+
+* Confirmação com detalhes do agendamento
+* Estilo moderno com gradiente e animação
+* Prevenção de exclusões acidentais
+
+### 🧠 Inteligência nos Planos
+
+* Renovação mensal automática
+* Reversão automática em caso de cancelamento
+* Histórico detalhado para o cliente
+
+### 📱 Design Mobile-First
+
+* Totalmente adaptável a celulares
+* UX fluido e moderno em qualquer tela
+
+### ❓ FAQ Integrado
+
+* Dúvidas comuns respondidas de forma clara
+* Orientações sobre o plano mensal e funcionamento
+
+### 🪟 Sistema de Modais Otimizado
+
+* Modais com dimensionamento automático (não esticados)
+* Altura adaptativa baseada no conteúdo (`fit-content`)
+* Rolagem vertical quando necessário
+* Classe específica para modal de confirmação
+* Design responsivo em todos os dispositivos
+
+---
+
+## 🌐 Implantação no Vercel
+
+### Como publicar:
+
+1. Faça um **fork** do repositório no GitHub
+2. Conecte o repositório à sua conta Vercel
+3. O projeto já possui o `vercel.json` configurado para:
+
+   * Framework: **Vite**
+   * Comando de build: `npm run build`
+   * Diretório de saída: `dist`
+   * Configurações para SPA com rotas client-side
+   * Cache otimizado para assets estáticos
+
+### Configurações importantes para o Vercel:
+
+* O arquivo `vercel.json` já está configurado com:
+  * Regras de rewrite para SPA (todas as rotas direcionadas para index.html)
+  * Headers de cache otimizados (assets imutáveis com cache longo)
+  * Configuração correta para o framework Vite
+
+* O arquivo `vite.config.js` está configurado sem base path para funcionar corretamente na Vercel
+
+* O arquivo `.vercelignore` exclui arquivos desnecessários do deploy
+
+Após o deploy, seu sistema estará ativo com domínio próprio da Vercel.
+
+---
+
+## 🧪 Ambiente de Desenvolvimento Local
+
+```bash
+# Instalar dependências
+npm install
+
+# Iniciar em modo desenvolvimento
+npm run dev
+
+# Gerar build de produção
+npm run build
+
+# Visualizar build
+npm run preview
+```
+
+---
+
+## 🔐 Acesso ao Painel Administrativo
+
+* URL: `/admin`
+* Usuário: `admin`
+* Senha: `barber2024`
+
+---
+
+## 💅 Guia de Estilização
+
+### Modais
+
+O sistema utiliza um conjunto de estilos CSS para garantir que os modais tenham aparência e comportamento consistentes:
+
+```css
+/* Estilos para modais */
+.fixed.inset-0 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.fixed.inset-0 > div {
+  width: auto;
+  max-width: 450px;
+  min-width: 300px;
+  margin: 0 auto;
+  max-height: fit-content;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+```
+
+Para modais de confirmação específicos, use a classe `.confirmation-modal`:
+
+```css
+.confirmation-modal {
+  height: auto !important;
+  align-self: flex-start;
+  width: 100%;
+}
+```
+
+---
+
+## ❓ Perguntas Frequentes (FAQ)
+
+### Como faço um agendamento?
+
+Clique em "**Agende seu horário**", informe seu nome, selecione o serviço, escolha a data e o horário disponíveis. Após isso, você receberá a confirmação do agendamento.
+
+### O que é o plano mensal?
+
+Plano exclusivo com **4 cortes por mês por R\$ 120,00**, ideal para quem mantém o estilo sempre em dia. Os cortes renovam a cada mês automaticamente.
+
+### Preciso usar o mesmo nome sempre?
+
+Sim. Para que o sistema reconheça seu plano corretamente, **o nome informado deve ser sempre o mesmo**.
+
+### Posso cancelar ou remarcar?
+
+Sim. Entre em contato pelo WhatsApp com pelo menos **2 horas de antecedência**. Se tiver um plano mensal, o corte cancelado **retorna ao seu saldo**.
+
+### Quais os horários de funcionamento?
+
+Segunda a sexta-feira, das **8h às 18h**. A barbearia **não abre aos fins de semana**.
+
+---
+
+## 🔒 Segurança e Boas Práticas
+
+* Autenticação de administrador com hash
+* Validação de dados em tempo real
+* Sanitização de entradas do usuário
+* Confirmação para ações críticas (como exclusão de agendamentos)

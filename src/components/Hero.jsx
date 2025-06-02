@@ -1,8 +1,6 @@
 import { Button } from "./ui/button"
 
 export default function Hero() {
-  const whatsappNumber = "558596988973"
-
   return (
     <section id="inicio" className="w-full bg-zinc-900 text-white relative overflow-hidden">
       {/* Overlay com gradiente */}
@@ -32,9 +30,7 @@ export default function Hero() {
         </p>
         <div className="mt-8 space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
           <a
-            href={`https://wa.me/${whatsappNumber}`}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#servicos"
             className="block sm:inline-block transform hover:scale-105 transition-transform duration-300"
           >
             <Button variant="gradient" className="w-full sm:w-auto text-lg px-8 py-3 h-auto">

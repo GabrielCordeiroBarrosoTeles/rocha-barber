@@ -1,12 +1,9 @@
-"use client"
-
 import { useState } from "react"
 import { Menu, X } from "./icons"
 import { Button } from "./ui/button"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const whatsappNumber = "558596988973"
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -18,7 +15,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           <a href="/" className="flex items-center group">
             <div className="relative w-10 h-10 mr-2 transform group-hover:scale-110 transition-transform duration-300">
-              <img src="./images/logo.png" alt="Rocha Barber Logo" className="object-contain w-full h-full" />
+              <img src="/images/logo.png" alt="Rocha Barber Logo" className="object-contain w-full h-full" />
             </div>
             <span className="font-bold text-xl group-hover:text-amber-400 transition-colors">Rocha Barber</span>
           </a>
@@ -50,11 +47,7 @@ export default function Header() {
               Contato
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
             </a>
-            <a
-              href={`https://wa.me/${whatsappNumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href="#servicos">
               <Button variant="gradient" className="transform hover:scale-105 transition-transform duration-300">Agendar</Button>
             </a>
           </nav>
@@ -77,12 +70,7 @@ export default function Header() {
             <a href="#contato" className="py-2 hover:text-amber-400 transition-colors" onClick={toggleMenu}>
               Contato
             </a>
-            <a
-              href={`https://wa.me/${whatsappNumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full"
-            >
+            <a href="#servicos" className="w-full" onClick={toggleMenu}>
               <Button variant="gradient" className="w-full">
                 Agendar
               </Button>
