@@ -8,15 +8,27 @@ export default function Footer() {
       <div className="container px-4 mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center mb-4 md:mb-0">
-            <img src="./images/logo.png" alt="Rocha Barber Logo" className="w-10 h-10 mr-2" />
+            <img src="/images/logo.png" alt="Rocha Barber Logo" className="w-10 h-10 mr-2" />
             <span className="font-bold text-xl">Rocha Barber</span>
           </div>
           
           <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
-            <a href="#inicio" className="hover:text-amber-400 transition-colors">Início</a>
-            <a href="#servicos" className="hover:text-amber-400 transition-colors">Serviços</a>
-            <a href="#sobre" className="hover:text-amber-400 transition-colors">Sobre</a>
-            <a href="#contato" className="hover:text-amber-400 transition-colors">Contato</a>
+            <a href="/#/" onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('inicio')?.scrollIntoView({behavior: 'smooth'});
+              }} className="hover:text-amber-400 transition-colors">Início</a>
+            <a href="/#/" onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('servicos')?.scrollIntoView({behavior: 'smooth'});
+              }} className="hover:text-amber-400 transition-colors">Serviços</a>
+            <a href="/#/" onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('sobre')?.scrollIntoView({behavior: 'smooth'});
+              }} className="hover:text-amber-400 transition-colors">Sobre</a>
+            <a href="/#/" onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('contato')?.scrollIntoView({behavior: 'smooth'});
+              }} className="hover:text-amber-400 transition-colors">Contato</a>
           </div>
         </div>
         

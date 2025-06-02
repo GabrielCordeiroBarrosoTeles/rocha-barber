@@ -141,6 +141,21 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
 
 * O arquivo `.vercelignore` exclui arquivos desnecessários do deploy
 
+### Otimizações para deploy:
+
+* Utilização de **HashRouter** em vez de BrowserRouter para melhor compatibilidade com hospedagem estática
+* Caminhos absolutos para recursos estáticos (`/images/` em vez de `./images/`)
+* Tratamento de erros robusto para evitar falhas silenciosas
+* Redirecionamento de rotas não encontradas para a página inicial
+
+### Navegação e Redirecionamentos:
+
+* Links de navegação (Início, Serviços, Sobre, Contato) utilizam JavaScript para rolagem suave até as seções
+* Botões "Agendar" redirecionam para a seção de serviços onde estão os cards
+* Cards de serviço redirecionam para a página de agendamento
+* Implementação de tratamento de erros para evitar tela branca em produção
+* Correção de importações e exportações para garantir compatibilidade com o build
+
 Após o deploy, seu sistema estará ativo com domínio próprio da Vercel.
 
 ---
@@ -165,7 +180,7 @@ npm run preview
 
 ## 🔐 Acesso ao Painel Administrativo
 
-* URL: `/admin`
+* URL: `/#/admin`
 * Usuário: `admin`
 * Senha: `barber2024`
 
