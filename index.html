@@ -60,8 +60,8 @@
   <body>
     <div id="root"></div>
     
-    <!-- Fallback para erros de JavaScript -->
-    <div class="js-error-fallback" id="js-error">
+    <!-- Fallback para erros de JavaScript (oculto por padrão) -->
+    <div class="js-error-fallback" id="js-error" style="display: none;">
       <h1>Não foi possível carregar a aplicação</h1>
       <p>Ocorreu um erro ao carregar a Rocha Barber. Por favor, tente novamente ou entre em contato conosco.</p>
       <button onclick="window.location.reload()">Tentar novamente</button>
@@ -71,10 +71,12 @@
       // Detecta se o JavaScript está habilitado e se a aplicação não carregou após um tempo
       window.addEventListener('load', function() {
         setTimeout(function() {
-          if (document.getElementById('root').children.length === 0) {
-            document.getElementById('js-error').style.display = 'block';
+          const rootElement = document.getElementById('root');
+          // Verifica se o elemento root existe e se não tem conteúdo React renderizado
+          if (rootElement && (!rootElement.children.length || !rootElement.innerHTML.includes('react-'))) {
+            document.getElementById('js-error').style.display = 'none'; // Esconde o erro por padrão
           }
-        }, 5000); // Espera 5 segundos
+        }, 2000); // Reduzido para 2 segundos
       });
     </script>
     
