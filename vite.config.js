@@ -7,15 +7,8 @@ export default defineConfig({
   build: {
     // Gera source maps para melhor depuração
     sourcemap: true,
-    // Otimiza o tamanho do bundle
-    minify: 'terser',
-    // Configurações do Terser para melhor otimização
-    terserOptions: {
-      compress: {
-        drop_console: false, // Mantém console.logs para depuração
-        drop_debugger: true
-      }
-    }
+    // Otimiza o tamanho do bundle usando o minificador padrão (esbuild)
+    minify: 'esbuild'
   },
   // Configuração para garantir que os assets sejam carregados corretamente
   base: '/',
