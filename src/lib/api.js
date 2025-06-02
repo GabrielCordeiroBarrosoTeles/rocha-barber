@@ -3,8 +3,7 @@ import {
   getWorkingDays, 
   updateWorkingDays, 
   getTimeSlots, 
-  updateTimeSlots, 
-  exportAllData
+  updateTimeSlots
 } from './database';
 
 // Função para inicializar o banco de dados
@@ -42,11 +41,10 @@ export async function initializeDatabase() {
 }
 
 // Função para exportar todos os dados como JSON
-// Implementação simplificada para exportAllData se não estiver disponível
-export const exportAllData = exportAllData || function() {
+export async function exportDataToFile() {
   console.log('Exportação de dados não implementada');
   return Promise.resolve();
-};
+}
 
 // Função para importar dados de um arquivo JSON
 export async function importDataFromFile(file) {
@@ -93,7 +91,7 @@ export function addDataManagementButtons(container) {
   `;
   exportButton.addEventListener('click', async () => {
     try {
-      await exportAllData();
+      await exportDataToFile();
       alert('Dados exportados com sucesso!');
     } catch (error) {
       console.error('Erro ao exportar dados:', error);
