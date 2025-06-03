@@ -23,7 +23,7 @@ export default function ServiceCard({
     console.log('Serviço salvo no localStorage:', serviceData);
     
     // Navega para a página de agendamento
-    window.location.href = '/#/agendamento';
+    window.location.href = '/agendamento';
   };
 
   return (

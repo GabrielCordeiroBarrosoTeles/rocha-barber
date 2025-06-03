@@ -30,7 +30,7 @@ export default function Hero() {
         </p>
         <div className="mt-8 space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
           <a
-            href="/#/" 
+            href="/" 
             onClick={(e) => {
               e.preventDefault();
               document.getElementById('servicos')?.scrollIntoView({behavior: 'smooth'});
@@ -42,7 +42,7 @@ export default function Hero() {
             </Button>
           </a>
           <a
-            href="/#/" 
+            href="/" 
             onClick={(e) => {
               e.preventDefault();
               document.getElementById('sobre')?.scrollIntoView({behavior: 'smooth'});
