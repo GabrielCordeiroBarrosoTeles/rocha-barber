@@ -217,18 +217,31 @@ export async function getClientMonthlyStats() {
       
       if (firstAppointment) {
         // Usar a data do primeiro agendamento como referência
-        const firstDate = new Date(firstAppointment.date);
-        
-        // Adicionar 30 dias à data do primeiro agendamento
-        const expiryDate = new Date(firstDate);
-        expiryDate.setDate(firstDate.getDate() + 30);
-        
-        // Calcular dias restantes
-        const timeDiff = expiryDate.getTime() - today.getTime();
-        daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
-        
-        // Se for negativo, não há mais dias restantes
-        if (daysLeft < 0) daysLeft = 0;
+        // Dividir a string de data em partes (YYYY-MM-DD)
+        const parts = firstAppointment.date.split('-');
+        if (parts.length === 3) {
+          const year = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const day = parseInt(parts[2], 10);
+          
+          // Criar data usando UTC para evitar problemas de fuso horário
+          const firstDate = new Date(Date.UTC(year, month, day));
+          
+          // Adicionar 30 dias à data do primeiro agendamento
+          const expiryDate = new Date(firstDate);
+          expiryDate.setUTCDate(firstDate.getUTCDate() + 30);
+          
+          // Calcular dias restantes usando UTC
+          const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+          const timeDiff = expiryDate.getTime() - todayUTC.getTime();
+          daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+          
+          // Se for negativo, não há mais dias restantes
+          if (daysLeft < 0) daysLeft = 0;
+          
+          // Limitar o número máximo de dias para 30
+          if (daysLeft > 30) daysLeft = 30;
+        }
       }
       
       // Formatar os agendamentos para exibição
