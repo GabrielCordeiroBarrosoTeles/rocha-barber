@@ -562,7 +562,6 @@ export default function Agendamento() {
                     <option key={option.value} value={option.value}>{option.label}</option>
                   ))}
                 </select>
-undefined
               </div>
               
               <div className="form-group">
