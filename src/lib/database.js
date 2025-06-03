@@ -1,5 +1,5 @@
 // src/lib/database.js
-import { supabase } from './supabase';
+import { supabase } from './supabase-direct';
 
 // O cliente supabase já está importado do arquivo supabase.js
 // Teste de conexão em segundo plano

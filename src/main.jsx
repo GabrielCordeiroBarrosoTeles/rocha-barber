@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 // Importação do Supabase para garantir inicialização antes de qualquer componente
-import './lib/supabaseInit'
+import './lib/supabase-direct'
 import App from './App.jsx'
 import Admin from './components/Admin.jsx'
 import Agendamento from './components/Agendamento.jsx'
