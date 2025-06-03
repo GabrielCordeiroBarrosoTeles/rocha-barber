@@ -55,8 +55,11 @@ export default function Admin() {
 
   const loadAppointments = async () => {
     try {
-      // Carrega os agendamentos diretamente do localStorage para maior confiabilidade
-      const savedAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+      // Importa a função getAppointments do database.js
+      const { getAppointments } = await import('../lib/database');
+      
+      // Obtém os agendamentos do Supabase (que inclui o telefone do cliente)
+      const savedAppointments = await getAppointments();
       
       // Ordenar por data e hora
       savedAppointments.sort((a, b) => {
@@ -275,42 +278,72 @@ export default function Admin() {
         
         try {
           // Importa a função de remover agendamento diretamente do database
-          const { removeAppointment } = await import('../lib/database');
+          const { supabase } = await import('../lib/supabase-direct');
           
-          // Remove o agendamento usando o sistema direto
-          const success = await removeAppointment(appointment.id);
+          // Exclui diretamente do banco de dados
+          const { error } = await supabase
+            .from('appointments')
+            .delete()
+            .eq('id', appointment.id);
           
-          if (success) {
-            // Atualiza a lista local
-            const updatedAppointments = [...appointments];
-            updatedAppointments.splice(index, 1);
-            setAppointments(updatedAppointments);
-            
-            // Exibe mensagem de sucesso
-            setMessage('Agendamento excluído com sucesso' + 
-              (appointment.planType === PLANS.MONTHLY ? ' e +1 agendamento adicionado ao plano do cliente.' : '.'));
-            
-            // Recarrega os dados dos clientes mensais
-            loadMonthlyClients();
-          } else {
-            // Tenta remover diretamente do localStorage como fallback
+          if (error) {
+            console.error('Erro ao excluir agendamento do Supabase:', error);
+            throw error;
+          }
+          
+          // Atualiza o localStorage
+          const localAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+          const updatedLocalAppointments = localAppointments.filter(app => app.id !== appointment.id);
+          localStorage.setItem('appointments', JSON.stringify(updatedLocalAppointments));
+          
+          // Atualiza a lista local
+          const updatedAppointments = [...appointments];
+          updatedAppointments.splice(index, 1);
+          setAppointments(updatedAppointments);
+          
+          // Exibe mensagem de sucesso
+          setMessage('Agendamento excluído com sucesso' + 
+            (appointment.planType === PLANS.MONTHLY ? ' e +1 agendamento adicionado ao plano do cliente.' : '.'));
+          
+          // Se for plano mensal, incrementa o contador de agendamentos restantes
+          if (appointment.planType === PLANS.MONTHLY) {
             try {
-              const localAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-              const updatedAppointments = localAppointments.filter(app => app.id !== appointment.id);
-              localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+              // Busca o cliente
+              const { data: clientData } = await supabase
+                .from('clients')
+                .select('id')
+                .eq('name', appointment.name)
+                .single();
               
-              // Atualiza a lista local
-              const updatedAppointmentsList = [...appointments];
-              updatedAppointmentsList.splice(index, 1);
-              setAppointments(updatedAppointmentsList);
-              
-              setMessage('Agendamento excluído com sucesso (modo offline).');
-              loadMonthlyClients();
+              if (clientData) {
+                // Busca o plano atual do cliente
+                const { data: planData } = await supabase
+                  .from('client_plans')
+                  .select('*')
+                  .eq('client_id', clientData.id)
+                  .eq('plan_type', 'monthly')
+                  .order('created_at', { ascending: false })
+                  .limit(1)
+                  .single();
+                
+                if (planData) {
+                  // Incrementa o contador de agendamentos restantes
+                  const newRemainingAppointments = planData.remaining_appointments + 1;
+                  
+                  // Atualiza o plano
+                  await supabase
+                    .from('client_plans')
+                    .update({ remaining_appointments: newRemainingAppointments })
+                    .eq('id', planData.id);
+                }
+              }
             } catch (e) {
-              console.error('Erro ao excluir agendamento do localStorage:', e);
-              setMessage('Erro ao excluir agendamento. Tente novamente.');
+              console.error('Erro ao atualizar plano do cliente:', e);
             }
           }
+          
+          // Recarrega os dados dos clientes mensais
+          loadMonthlyClients();
         } catch (error) {
           console.error('Erro ao excluir agendamento:', error);
           
@@ -703,8 +736,45 @@ export default function Admin() {
                                               document.body.removeChild(modalOverlay);
                                               
                                               try {
-                                                const { removeAppointment } = await import('../lib/database');
-                                                await removeAppointment(app.id);
+                                                const { supabase } = await import('../lib/supabase-direct');
+                                                
+                                                // Exclui diretamente do banco de dados
+                                                const { error } = await supabase
+                                                  .from('appointments')
+                                                  .delete()
+                                                  .eq('id', app.id);
+                                                
+                                                if (error) {
+                                                  console.error('Erro ao excluir agendamento do Supabase:', error);
+                                                  throw error;
+                                                }
+                                                
+                                                // Incrementa o contador de agendamentos restantes
+                                                try {
+                                                  // Busca o plano atual do cliente
+                                                  const { data: planData } = await supabase
+                                                    .from('client_plans')
+                                                    .select('*')
+                                                    .eq('client_id', client.id)
+                                                    .eq('plan_type', 'monthly')
+                                                    .order('created_at', { ascending: false })
+                                                    .limit(1)
+                                                    .single();
+                                                  
+                                                  if (planData) {
+                                                    // Incrementa o contador de agendamentos restantes
+                                                    const newRemainingAppointments = planData.remaining_appointments + 1;
+                                                    
+                                                    // Atualiza o plano
+                                                    await supabase
+                                                      .from('client_plans')
+                                                      .update({ remaining_appointments: newRemainingAppointments })
+                                                      .eq('id', planData.id);
+                                                  }
+                                                } catch (e) {
+                                                  console.error('Erro ao atualizar plano do cliente:', e);
+                                                }
+                                                
                                                 loadMonthlyClients(); // Recarregar dados após exclusão
                                                 loadAppointments(); // Atualizar lista de agendamentos
                                                 setMessage('Agendamento excluído com sucesso e +1 agendamento adicionado ao plano do cliente.');

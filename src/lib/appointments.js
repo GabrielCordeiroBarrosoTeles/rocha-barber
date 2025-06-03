@@ -30,13 +30,8 @@ export async function addAppointment(appointment) {
   try {
     console.log('Iniciando agendamento:', appointment);
     
-    // Cria ou obtém o cliente
-    const client = await getOrCreateClient(appointment.name);
-    if (!client) {
-      console.error('Falha ao criar/obter cliente');
-      return null;
-    }
-    
+    // Cria ou obtém o cliente (passando o telefone para ser salvo na tabela clients)
+    const client = await getOrCreateClient(appointment.name, appointment.phone);
     console.log('Cliente encontrado/criado:', client);
     
     // Se for plano mensal
@@ -51,32 +46,25 @@ export async function addAppointment(appointment) {
         if (!plan) {
           console.log('Criando novo plano mensal');
           plan = await createClientPlan(client.id, 'monthly');
-          if (!plan) {
-            console.error('Falha ao criar plano mensal');
-            // Mesmo com falha, vamos tentar criar o agendamento avulso
+          console.log('Novo plano criado:', plan);
+          
+          // Verifica se ainda tem agendamentos disponíveis
+          if (plan.remaining_appointments <= 0) {
+            console.error('Sem agendamentos disponíveis no plano');
+            // Mesmo sem agendamentos, vamos tentar criar o agendamento avulso
             console.log('Continuando com agendamento avulso');
             appointment.planType = 'single';
           } else {
-            console.log('Novo plano criado:', plan);
-            
-            // Verifica se ainda tem agendamentos disponíveis
-            if (plan.remaining_appointments <= 0) {
-              console.error('Sem agendamentos disponíveis no plano');
-              // Mesmo sem agendamentos, vamos tentar criar o agendamento avulso
+            // Atualiza o contador de agendamentos restantes
+            const success = await updateClientPlan(plan.id, plan.remaining_appointments - 1);
+            if (!success) {
+              console.error('Falha ao atualizar contador de agendamentos');
+              // Mesmo com falha, vamos tentar criar o agendamento avulso
               console.log('Continuando com agendamento avulso');
               appointment.planType = 'single';
             } else {
-              // Atualiza o contador de agendamentos restantes
-              const success = await updateClientPlan(plan.id, plan.remaining_appointments - 1);
-              if (!success) {
-                console.error('Falha ao atualizar contador de agendamentos');
-                // Mesmo com falha, vamos tentar criar o agendamento avulso
-                console.log('Continuando com agendamento avulso');
-                appointment.planType = 'single';
-              } else {
-                clientPlanId = plan.id;
-                console.log('Plano atualizado, ID:', clientPlanId);
-              }
+              clientPlanId = plan.id;
+              console.log('Plano atualizado, ID:', clientPlanId);
             }
           }
         } else {
@@ -115,47 +103,20 @@ export async function addAppointment(appointment) {
       time: appointment.time,
       service: appointment.service,
       planType: appointment.planType,
-      clientPlanId,
-      phone: appointment.phone
+      clientPlanId
     });
     
+    // Aqui é onde o agendamento é realmente criado no Supabase
     const newAppointment = await createAppointment(
       client.id,
       appointment.date,
       appointment.time,
       appointment.service,
       appointment.planType,
-      clientPlanId,
-      appointment.phone
+      clientPlanId
     );
     
-    if (!newAppointment) {
-      console.error('Falha ao criar agendamento no banco de dados');
-      return null;
-    }
-    
     console.log('Agendamento criado com sucesso:', newAppointment);
-    
-    // Atualiza a lista de agendamentos no localStorage para garantir que apareça no admin
-    try {
-      const localAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-      const newAppointmentEntry = {
-        id: newAppointment.id,
-        name: client.name,
-        date: appointment.date,
-        time: appointment.time,
-        service: appointment.service,
-        planType: appointment.planType,
-        phone: appointment.phone,
-        createdAt: new Date().toISOString()
-      };
-      
-      localAppointments.push(newAppointmentEntry);
-      localStorage.setItem('appointments', JSON.stringify(localAppointments));
-      console.log('Agendamento adicionado ao localStorage');
-    } catch (storageError) {
-      console.error('Erro ao atualizar localStorage:', storageError);
-    }
     
     // Retorna o agendamento completo com todas as informações necessárias
     return {
@@ -167,7 +128,7 @@ export async function addAppointment(appointment) {
     };
   } catch (error) {
     console.error('Erro ao adicionar agendamento:', error);
-    return null;
+    throw error; // Propaga o erro para ser tratado pelo chamador
   }
 }
 

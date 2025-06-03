@@ -1,40 +1,156 @@
-// src/lib/debug.js
-import { createClient } from '@supabase/supabase-js';
+// Arquivo para funções de debug e diagnóstico
 
-// Configuração do Supabase - usando import.meta.env para Vite
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-// Função para verificar a conexão com o Supabase
-export async function checkSupabaseConnection() {
-  console.log('Verificando conexão com o Supabase...');
-  console.log('URL:', SUPABASE_URL);
-  console.log('ANON_KEY:', SUPABASE_ANON_KEY ? 'Configurada' : 'Não configurada');
-  
+// Função para testar a conexão com o Supabase
+export async function testSupabaseConnection(supabase) {
   try {
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      console.error('Credenciais do Supabase não configuradas corretamente');
-      return false;
-    }
-    
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Testando conexão com Supabase...');
     
     // Tenta fazer uma consulta simples
     const { data, error } = await supabase
-      .from('working_days')
-      .select('*')
-      .limit(1);
+      .from('clients')
+      .select('count', { count: 'exact', head: true });
     
     if (error) {
-      console.error('Erro ao conectar com o Supabase:', error);
-      return false;
+      console.error('Erro ao testar conexão com Supabase:', error);
+      return {
+        success: false,
+        error: error.message,
+        details: error
+      };
     }
     
-    console.log('Conexão com o Supabase estabelecida com sucesso!');
-    console.log('Dados de exemplo:', data);
-    return true;
+    console.log('Conexão com Supabase testada com sucesso');
+    return {
+      success: true,
+      message: 'Conexão com Supabase estabelecida com sucesso'
+    };
   } catch (error) {
-    console.error('Erro ao inicializar o cliente Supabase:', error);
-    return false;
+    console.error('Exceção ao testar conexão com Supabase:', error);
+    return {
+      success: false,
+      error: error.message,
+      details: error
+    };
   }
+}
+
+// Função para verificar se as tabelas necessárias existem
+export async function checkTables(supabase) {
+  try {
+    console.log('Verificando tabelas no Supabase...');
+    
+    const tables = [
+      'clients',
+      'appointments',
+      'client_plans',
+      'working_days',
+      'time_slots'
+    ];
+    
+    const results = {};
+    
+    for (const table of tables) {
+      try {
+        const { data, error } = await supabase
+          .from(table)
+          .select('count', { count: 'exact', head: true });
+        
+        results[table] = {
+          exists: !error,
+          error: error ? error.message : null
+        };
+      } catch (e) {
+        results[table] = {
+          exists: false,
+          error: e.message
+        };
+      }
+    }
+    
+    return results;
+  } catch (error) {
+    console.error('Erro ao verificar tabelas:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// Função para criar um agendamento de teste
+export async function createTestAppointment(supabase) {
+  try {
+    console.log('Criando agendamento de teste...');
+    
+    // Primeiro cria um cliente de teste
+    const { data: client, error: clientError } = await supabase
+      .from('clients')
+      .insert({ name: 'Cliente Teste' })
+      .select()
+      .single();
+    
+    if (clientError) {
+      console.error('Erro ao criar cliente de teste:', clientError);
+      return {
+        success: false,
+        error: clientError.message
+      };
+    }
+    
+    // Cria um agendamento de teste
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateStr = tomorrow.toISOString().split('T')[0];
+    
+    const { data: appointment, error: appointmentError } = await supabase
+      .from('appointments')
+      .insert({
+        client_id: client.id,
+        date: dateStr,
+        time: '10:00',
+        service: 'Serviço de Teste',
+        plan_type: 'single',
+        phone: '(00) 00000-0000'
+      })
+      .select()
+      .single();
+    
+    if (appointmentError) {
+      console.error('Erro ao criar agendamento de teste:', appointmentError);
+      return {
+        success: false,
+        error: appointmentError.message
+      };
+    }
+    
+    console.log('Agendamento de teste criado com sucesso:', appointment);
+    return {
+      success: true,
+      client,
+      appointment
+    };
+  } catch (error) {
+    console.error('Exceção ao criar agendamento de teste:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// Função para executar todos os testes de diagnóstico
+export async function runDiagnostics(supabase) {
+  console.log('Iniciando diagnóstico do Supabase...');
+  
+  const results = {
+    connection: await testSupabaseConnection(supabase),
+    tables: await checkTables(supabase)
+  };
+  
+  if (results.connection.success) {
+    results.testAppointment = await createTestAppointment(supabase);
+  }
+  
+  console.log('Diagnóstico concluído:', results);
+  return results;
 }

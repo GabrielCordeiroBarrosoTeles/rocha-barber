@@ -2,18 +2,20 @@
 import { supabase } from './supabase-direct';
 
 // O cliente supabase já está importado do arquivo supabase.js
-// Teste de conexão em segundo plano
+// Teste de conexão em segundo plano e exibe informações detalhadas
 setTimeout(() => {
   supabase.from('clients').select('count', { count: 'exact', head: true })
     .then(({ error }) => {
       if (error) {
         console.error('Erro ao testar conexão com Supabase:', error);
+        alert('Erro de conexão com o banco de dados. Verifique sua conexão com a internet.');
       } else {
         console.log('Conexão com Supabase testada com sucesso');
       }
     })
     .catch(err => {
       console.error('Exceção ao testar conexão com Supabase:', err);
+      alert('Erro de conexão com o banco de dados. Verifique sua conexão com a internet.');
     });
 }, 1000);
 
@@ -176,9 +178,9 @@ export async function updateTimeSlots(slots) {
 }
 
 // Função para obter ou criar um cliente pelo nome
-export async function getOrCreateClient(name) {
+export async function getOrCreateClient(name, phone = null) {
   try {
-    if (!name) return null;
+    if (!name) throw new Error('Nome do cliente não fornecido');
     
     // Busca o cliente pelo nome
     const { data: existingClient, error: searchError } = await supabase
@@ -189,29 +191,45 @@ export async function getOrCreateClient(name) {
     
     if (searchError && searchError.code !== 'PGRST116') { // PGRST116 = not found
       console.error('Erro ao buscar cliente:', searchError);
-      return null;
+      throw new Error(`Erro ao buscar cliente: ${searchError.message}`);
     }
     
     if (existingClient) {
+      // Se encontrou o cliente e temos um telefone, atualiza o telefone se necessário
+      if (phone && existingClient.phone !== phone) {
+        const { error: updateError } = await supabase
+          .from('clients')
+          .update({ phone })
+          .eq('id', existingClient.id);
+          
+        if (updateError) {
+          console.error('Erro ao atualizar telefone do cliente:', updateError);
+        }
+      }
       return existingClient;
     }
     
-    // Cria um novo cliente
+    // Cria um novo cliente com telefone se fornecido
+    const clientData = { name };
+    if (phone) {
+      clientData.phone = phone;
+    }
+    
     const { data: newClient, error: insertError } = await supabase
       .from('clients')
-      .insert({ name })
+      .insert(clientData)
       .select()
       .single();
     
     if (insertError) {
       console.error('Erro ao criar cliente:', insertError);
-      return null;
+      throw new Error(`Erro ao criar cliente: ${insertError.message}`);
     }
     
     return newClient;
   } catch (error) {
     console.error('Erro ao obter/criar cliente:', error);
-    return null;
+    throw error; // Propaga o erro para ser tratado pelo chamador
   }
 }
 
@@ -420,8 +438,8 @@ export async function getAppointments() {
     const { data, error } = await supabase
       .from('appointments')
       .select(`
-        id, date, time, service, created_at, plan_type, phone,
-        clients (id, name)
+        id, date, time, service, created_at, plan_type,
+        clients (id, name, phone)
       `)
       .order('date', { ascending: true });
     
@@ -443,7 +461,7 @@ export async function getAppointments() {
       time: appointment.time,
       service: appointment.service,
       planType: appointment.plan_type,
-      phone: appointment.phone,
+      phone: appointment.clients?.phone,
       createdAt: appointment.created_at
     }));
     
@@ -465,7 +483,10 @@ export async function getAppointments() {
 // Função para criar um agendamento
 export async function createAppointment(clientId, date, time, service, planType, clientPlanId, phone) {
   try {
-    if (!clientId || !date || !time || !service) return null;
+    if (!clientId || !date || !time || !service) {
+      console.error('Dados obrigatórios não fornecidos para criar agendamento');
+      throw new Error('Dados incompletos para criar agendamento');
+    }
     
     console.log('Criando agendamento com dados:', {
       client_id: clientId,
@@ -473,11 +494,22 @@ export async function createAppointment(clientId, date, time, service, planType,
       time,
       service,
       plan_type: planType,
-      client_plan_id: clientPlanId,
-      phone
+      client_plan_id: clientPlanId
     });
     
-    // Cria o agendamento no Supabase
+    // Verifica a conexão com o Supabase antes de tentar inserir
+    try {
+      const { error: connectionError } = await supabase.from('appointments').select('count', { count: 'exact', head: true });
+      if (connectionError) {
+        console.error('Erro de conexão com o Supabase:', connectionError);
+        throw new Error(`Erro de conexão com o banco de dados: ${connectionError.message}`);
+      }
+    } catch (connError) {
+      console.error('Falha ao verificar conexão com o Supabase:', connError);
+      throw new Error('Não foi possível conectar ao banco de dados. Verifique sua conexão com a internet.');
+    }
+    
+    // Cria o agendamento no Supabase - removendo o campo phone que não existe na tabela
     const { data, error } = await supabase
       .from('appointments')
       .insert({
@@ -486,15 +518,19 @@ export async function createAppointment(clientId, date, time, service, planType,
         time,
         service,
         plan_type: planType,
-        client_plan_id: clientPlanId,
-        phone
+        client_plan_id: clientPlanId
       })
       .select()
       .single();
     
     if (error) {
       console.error('Erro ao criar agendamento no Supabase:', error);
-      return null;
+      throw new Error(`Erro ao criar agendamento: ${error.message}`);
+    }
+    
+    if (!data || !data.id) {
+      console.error('Agendamento criado sem retornar ID válido');
+      throw new Error('Falha ao criar agendamento no banco de dados');
     }
     
     console.log('Agendamento criado com sucesso no Supabase:', data);
@@ -533,7 +569,7 @@ export async function createAppointment(clientId, date, time, service, planType,
     return data;
   } catch (error) {
     console.error('Erro ao criar agendamento:', error);
-    return null;
+    throw error; // Propaga o erro para ser tratado pelo chamador
   }
 }
 
@@ -575,7 +611,7 @@ export async function removeAppointment(id) {
     // Busca o agendamento para verificar se é de plano mensal
     const { data: appointment, error: fetchError } = await supabase
       .from('appointments')
-      .select('*, clients(name)')
+      .select('*, clients(name, id)')
       .eq('id', id)
       .single();
     
@@ -603,6 +639,9 @@ export async function removeAppointment(id) {
         
         // Busca o plano atual
         let clientId = appData.client_id;
+        if (appData.clients && appData.clients.id) {
+          clientId = appData.clients.id;
+        }
         let clientName = appData.clients?.name || appData.name;
         
         // Se não temos o client_id mas temos o nome, busca o cliente pelo nome
@@ -654,18 +693,18 @@ export async function removeAppointment(id) {
       }
     }
     
-    // Remove do Supabase se existir lá
-    if (!fetchError) {
-      const { error } = await supabase
-        .from('appointments')
-        .delete()
-        .eq('id', id);
-      
-      if (error) {
-        console.error('Erro ao remover agendamento do Supabase:', error);
-      } else {
-        console.log('Agendamento removido do Supabase com sucesso');
-      }
+    // Remove do Supabase independentemente de ter encontrado ou não
+    // Isso garante que tentaremos excluir mesmo se houver problemas na busca
+    const { error: deleteError } = await supabase
+      .from('appointments')
+      .delete()
+      .eq('id', id);
+    
+    if (deleteError) {
+      console.error('Erro ao remover agendamento do Supabase:', deleteError);
+      // Mesmo com erro, continuamos para remover do localStorage
+    } else {
+      console.log('Agendamento removido do Supabase com sucesso');
     }
     
     // Remove do localStorage
@@ -677,6 +716,17 @@ export async function removeAppointment(id) {
     return true;
   } catch (error) {
     console.error('Erro ao remover agendamento:', error);
+    
+    // Mesmo com erro, tenta remover do localStorage para manter consistência
+    try {
+      const localAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+      const updatedAppointments = localAppointments.filter(app => app.id !== id);
+      localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+      console.log('Agendamento removido do localStorage após erro');
+    } catch (e) {
+      console.error('Erro ao remover do localStorage após falha:', e);
+    }
+    
     return false;
   }
 }
