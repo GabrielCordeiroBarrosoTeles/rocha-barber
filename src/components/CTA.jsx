@@ -9,7 +9,7 @@ export default function CTA() {
           Agende seu horário agora mesmo e experimente o melhor serviço de barbearia da região.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <a href="/#/" onClick={(e) => {
+          <a href="/" onClick={(e) => {
                 e.preventDefault();
                 document.getElementById('servicos')?.scrollIntoView({behavior: 'smooth'});
               }}>
@@ -20,7 +20,7 @@ export default function CTA() {
               Agendar agora
             </Button>
           </a>
-          <a href="/#/" onClick={(e) => {
+          <a href="/" onClick={(e) => {
               e.preventDefault();
               document.getElementById('servicos')?.scrollIntoView({behavior: 'smooth'});
             }}>
