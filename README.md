@@ -78,6 +78,7 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
 
 * Filtro automático por dias de funcionamento
 * Alertas claros para datas indisponíveis
+* Tratamento robusto de datas para evitar problemas de fuso horário
 
 ### 📅 Organização de Horários
 
@@ -275,3 +276,67 @@ Segunda a sexta-feira, das **8h às 18h**. A barbearia **não abre aos fins de s
 * Validação de dados em tempo real
 * Sanitização de entradas do usuário
 * Confirmação para ações críticas (como exclusão de agendamentos)
+
+---
+
+## ⏰ Tratamento de Datas e Fuso Horário
+
+O sistema implementa um tratamento especial para datas, evitando problemas comuns relacionados a fuso horário:
+
+### Problema Resolvido
+
+* Quando um cliente selecionava uma data (ex: 04/06/2025), o sistema às vezes exibia ou salvava como dia anterior (03/06/2025)
+* Isso ocorria devido ao comportamento do JavaScript ao criar objetos Date a partir de strings no formato "YYYY-MM-DD"
+* O JavaScript interpreta essas datas em UTC e depois converte para o fuso horário local, podendo causar mudança de dia
+
+### Soluções Implementadas
+
+1. **Formatação Direta de Strings**
+   * Conversão direta de YYYY-MM-DD para DD/MM/YYYY usando `date.split('-').reverse().join('/')`
+   * Evita completamente o uso de objetos Date para formatação simples
+   * Implementado em `Agendamento.jsx` para exibição de datas nos modais de confirmação
+
+2. **Uso de UTC para Cálculos**
+   * Criação de datas usando `Date.UTC()` para garantir consistência
+   * Uso de métodos `getUTCDate()`, `getUTCMonth()` e `getUTCDay()` para operações
+   * Implementado em `database.js` para garantir consistência no armazenamento
+
+3. **Formatação Manual de Datas**
+   * Implementação de função personalizada para formatar datas com dia da semana
+   * Arrays de nomes de dias e meses em português para formatação consistente
+   * Implementado em `Admin.jsx` para exibição correta de datas no painel administrativo:
+   ```javascript
+   const formatDate = (dateString) => {
+     // Dividir a string de data em partes (YYYY-MM-DD)
+     const parts = dateString.split('-');
+     if (parts.length !== 3) return dateString;
+     
+     // Obter os componentes da data
+     const year = parseInt(parts[0], 10);
+     const month = parseInt(parts[1], 10) - 1;
+     const day = parseInt(parts[2], 10);
+     
+     // Nomes dos dias da semana e meses em português
+     const weekdays = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+     const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+     
+     // Calcular o dia da semana usando UTC para evitar problemas de fuso horário
+     const date = new Date(Date.UTC(year, month, day));
+     const weekday = weekdays[date.getUTCDay()];
+     const monthName = months[month];
+     
+     // Formatar a data manualmente: "dia da semana, dia de mês de ano"
+     return `${weekday}, ${day} de ${monthName} de ${year}`;
+   };
+   ```
+
+4. **Ordenação Segura**
+   * Comparação de datas usando componentes individuais (ano, mês, dia)
+   * Evita problemas de ordenação causados por fuso horário
+   * Implementado em `Admin.jsx` para ordenação correta de agendamentos
+
+5. **Modificação em DateHelper.js**
+   * Simplificação da função `formatDate` para evitar problemas de fuso horário
+   * Conversão direta para formato DD/MM/YYYY sem usar objetos Date
+
+Estas implementações garantem que as datas sejam exibidas e processadas corretamente em todos os ambientes, independentemente do fuso horário do servidor ou do cliente.

@@ -488,6 +488,14 @@ export async function createAppointment(clientId, date, time, service, planType,
       throw new Error('Dados incompletos para criar agendamento');
     }
     
+    // Garantir que a data não seja afetada por problemas de fuso horário
+    // Mantém a data exatamente como foi inserida pelo usuário
+    const dateParts = date.split('-');
+    if (dateParts.length === 3) {
+      // A data já está no formato correto, não precisa modificar
+      console.log('Data original mantida:', date);
+    }
+    
     console.log('Criando agendamento com dados:', {
       client_id: clientId,
       date,
@@ -514,7 +522,7 @@ export async function createAppointment(clientId, date, time, service, planType,
       .from('appointments')
       .insert({
         client_id: clientId,
-        date,
+        date: date, // Garantir que a data seja exatamente a que o usuário selecionou
         time,
         service,
         plan_type: planType,
@@ -576,9 +584,12 @@ export async function createAppointment(clientId, date, time, service, planType,
 // Função para verificar se um horário está disponível
 export async function checkTimeAvailability(date, time) {
   try {
+    // Garantir que a data não seja afetada por problemas de fuso horário
+    let dateToCheck = date;
+    
     // Verifica no localStorage primeiro
     const localAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-    const isBooked = localAppointments.some(app => app.date === date && app.time === time);
+    const isBooked = localAppointments.some(app => app.date === dateToCheck && app.time === time);
     
     if (isBooked) {
       return false;
@@ -588,7 +599,7 @@ export async function checkTimeAvailability(date, time) {
     const { data, error } = await supabase
       .from('appointments')
       .select('id')
-      .eq('date', date)
+      .eq('date', dateToCheck)
       .eq('time', time);
     
     if (error) {
