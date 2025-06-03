@@ -82,14 +82,12 @@ export async function getClientPlan(clientName) {
     
     // Se encontrou um plano, formata para o formato esperado pelo frontend
     if (plan) {
-      // Para planos mensais, sempre retornar 4 cortes disponíveis
+      // Para planos mensais, usar o valor real de cortes disponíveis
       if (plan.plan_type === PLANS.MONTHLY) {
-        const maxAppointments = PLAN_CONFIG[PLANS.MONTHLY].maxAppointments;
-        
         return {
           id: plan.id,
           type: plan.plan_type,
-          remainingAppointments: maxAppointments, // Sempre 4 cortes disponíveis
+          remainingAppointments: plan.remaining_appointments, // Usar o valor real do banco
           month: plan.month,
           year: plan.year,
           clientId: client.id
