@@ -19,11 +19,17 @@ export default function ServiceCard({
       description
     };
     
-    localStorage.setItem('selectedService', JSON.stringify(serviceData));
-    console.log('Serviço salvo no localStorage:', serviceData);
-    
-    // Navega para a página de agendamento usando o caminho correto
-    window.location.href = '/agendamento';
+    try {
+      localStorage.setItem('selectedService', JSON.stringify(serviceData));
+      console.log('Serviço salvo no localStorage:', serviceData);
+      
+      // Navega para a página de agendamento usando o caminho correto
+      window.location.href = '/agendamento';
+    } catch (error) {
+      console.error('Erro ao salvar serviço ou navegar:', error);
+      // Fallback para caso de erro
+      window.location.replace('/agendamento');
+    }
   };
 
   return (
