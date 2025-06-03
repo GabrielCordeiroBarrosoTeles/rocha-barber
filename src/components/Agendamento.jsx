@@ -277,7 +277,7 @@ export default function Agendamento() {
                 </div>
                 <div>
                   <p class="text-sm text-zinc-500 font-medium">Data</p>
-                  <p class="text-zinc-800 font-bold">${new Date(date).toLocaleDateString('pt-BR')}</p>
+                  <p class="text-zinc-800 font-bold">${date.split('-').reverse().join('/')}</p>
                 </div>
               </div>
               
@@ -370,7 +370,7 @@ export default function Agendamento() {
                     </div>
                     <div>
                       <p class="text-sm text-zinc-500 font-medium">Data</p>
-                      <p class="text-zinc-800 font-bold">${new Date(date).toLocaleDateString('pt-BR')}</p>
+                      <p class="text-zinc-800 font-bold">${date.split('-').reverse().join('/')}</p>
                     </div>
                   </div>
                   

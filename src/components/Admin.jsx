@@ -63,8 +63,22 @@ export default function Admin() {
       
       // Ordenar por data e hora
       savedAppointments.sort((a, b) => {
-        // Primeiro compara as datas
-        const dateComparison = new Date(a.date) - new Date(b.date);
+        // Primeiro compara as datas usando partes da data para evitar problemas de fuso horário
+        const partsA = a.date.split('-');
+        const partsB = b.date.split('-');
+        
+        const yearA = parseInt(partsA[0], 10);
+        const monthA = parseInt(partsA[1], 10) - 1;
+        const dayA = parseInt(partsA[2], 10);
+        
+        const yearB = parseInt(partsB[0], 10);
+        const monthB = parseInt(partsB[1], 10) - 1;
+        const dayB = parseInt(partsB[2], 10);
+        
+        const dateA = new Date(Date.UTC(yearA, monthA, dayA));
+        const dateB = new Date(Date.UTC(yearB, monthB, dayB));
+        
+        const dateComparison = dateA - dateB;
         if (dateComparison !== 0) return dateComparison;
         
         // Se as datas forem iguais, compara os horários
@@ -378,8 +392,31 @@ export default function Admin() {
 
   // Formatação de data para exibição
   const formatDate = (dateString) => {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('pt-BR', options);
+    try {
+      // Dividir a string de data em partes (YYYY-MM-DD)
+      const parts = dateString.split('-');
+      if (parts.length !== 3) return dateString;
+      
+      // Obter os componentes da data
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      
+      // Nomes dos dias da semana e meses em português
+      const weekdays = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+      const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+      
+      // Calcular o dia da semana usando UTC para evitar problemas de fuso horário
+      const date = new Date(Date.UTC(year, month, day));
+      const weekday = weekdays[date.getUTCDay()];
+      const monthName = months[month];
+      
+      // Formatar a data manualmente: "dia da semana, dia de mês de ano"
+      return `${weekday}, ${day} de ${monthName} de ${year}`;
+    } catch (error) {
+      console.error('Erro ao formatar data:', error);
+      return dateString;
+    }
   };
 
   if (!isAuthenticated) {
@@ -639,7 +676,7 @@ export default function Admin() {
                               Mês de referência: {new Date(0, client.month).toLocaleString('pt-BR', { month: 'long' })} / {client.year}
                               {client.firstAppointmentDate && (
                                 <div className="mt-1 text-xs text-zinc-500">
-                                  Primeiro agendamento: {new Date(client.firstAppointmentDate).toLocaleDateString('pt-BR')}
+                                  Primeiro agendamento: {client.firstAppointmentDate.split('-').reverse().join('/')}
                                 </div>
                               )}
                               {client.daysLeft > 0 && (
@@ -655,10 +692,27 @@ export default function Admin() {
                               {client.firstAppointmentDate && (
                                 <div className="mt-1 text-xs text-zinc-500">
                                   Validade: {(() => {
-                                    const firstDate = new Date(client.firstAppointmentDate);
+                                    // Dividir a string de data em partes (YYYY-MM-DD)
+                                    const parts = client.firstAppointmentDate.split('-');
+                                    if (parts.length !== 3) return client.firstAppointmentDate;
+                                    
+                                    // Criar data com UTC para evitar problemas de fuso horário
+                                    const firstDate = new Date(Date.UTC(
+                                      parseInt(parts[0], 10),
+                                      parseInt(parts[1], 10) - 1,
+                                      parseInt(parts[2], 10)
+                                    ));
+                                    
+                                    // Adicionar 30 dias
                                     const expiryDate = new Date(firstDate);
-                                    expiryDate.setDate(firstDate.getDate() + 30);
-                                    return expiryDate.toLocaleDateString('pt-BR');
+                                    expiryDate.setUTCDate(firstDate.getUTCDate() + 30);
+                                    
+                                    // Formatar como DD/MM/YYYY
+                                    const day = expiryDate.getUTCDate().toString().padStart(2, '0');
+                                    const month = (expiryDate.getUTCMonth() + 1).toString().padStart(2, '0');
+                                    const year = expiryDate.getUTCFullYear();
+                                    
+                                    return `${day}/${month}/${year}`;
                                   })()}
                                 </div>
                               )}
@@ -699,7 +753,7 @@ export default function Admin() {
                                                     <span class="text-zinc-800">${app.service}</span>
                                                     
                                                     <span class="text-zinc-500 font-medium">Data:</span>
-                                                    <span class="text-zinc-800">${new Date(app.date).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                                    <span class="text-zinc-800">${formatDate(app.date)}</span>
                                                     
                                                     <span class="text-zinc-500 font-medium">Horário:</span>
                                                     <span class="text-zinc-800">${app.time}</span>
@@ -793,7 +847,7 @@ export default function Admin() {
                                         </button>
                                       </div>
                                       <div className="text-zinc-500">
-                                        {new Date(app.date).toLocaleDateString('pt-BR')} às {app.time}
+                                        {app.date.split('-').reverse().join('/')} às {app.time}
                                       </div>
                                     </div>
                                   ))
@@ -822,7 +876,7 @@ export default function Admin() {
                                           <div className="mt-1 pl-2 border-l-2 border-amber-200">
                                             {hist.appointments.map((app, j) => (
                                               <div key={j} className="text-xs text-zinc-600">
-                                                {new Date(app.date).toLocaleDateString('pt-BR')} - {app.service}
+                                                {app.date.split('-').reverse().join('/')} - {app.service}
                                               </div>
                                             ))}
                                           </div>

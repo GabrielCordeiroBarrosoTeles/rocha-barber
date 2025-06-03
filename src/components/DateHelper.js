@@ -49,18 +49,8 @@ export function formatDate(dateString) {
     const parts = dateString.split('-');
     if (parts.length !== 3) return dateString;
     
-    const year = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1;
-    const day = parseInt(parts[2], 10);
-    
-    const date = new Date(year, month, day);
-    
-    return date.toLocaleDateString('pt-BR', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    // Formato direto DD/MM/YYYY para evitar problemas de fuso horário
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
   } catch (error) {
     console.error('Erro ao formatar data:', error);
     return dateString;
