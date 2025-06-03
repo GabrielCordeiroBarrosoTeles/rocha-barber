@@ -1,44 +1,9 @@
 // src/lib/database.js
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from './supabase';
 
-// Configuração do Supabase - usando import.meta.env para Vite
-// Valores fixos como fallback para produção
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://nbwyzcpxzuixmxgecilb.supabase.co';
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5id3l6Y3B4enVpeG14Z2VjaWxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgzMDkwOTcsImV4cCI6MjA2Mzg4NTA5N30.SjSSFQ9ZGfvHoTGSHkqxudLLlPH8m0vBGefUK8ef9IM';
-
-// Inicializa o cliente Supabase com tratamento de erro
-let supabase;
-
-// Função para criar um cliente mock do Supabase
-const createMockClient = (errorMessage) => {
-  console.error(errorMessage);
-  return {
-    from: () => ({
-      select: () => ({ data: null, error: new Error(errorMessage) }),
-      insert: () => ({ data: null, error: new Error(errorMessage) }),
-      update: () => ({ data: null, error: new Error(errorMessage) }),
-      upsert: () => ({ data: null, error: new Error(errorMessage) }),
-      delete: () => ({ data: null, error: new Error(errorMessage) }),
-      eq: () => ({ data: null, error: new Error(errorMessage) }),
-      single: () => ({ data: null, error: new Error(errorMessage) }),
-      order: () => ({ data: null, error: new Error(errorMessage), limit: () => ({ data: null, error: new Error(errorMessage), single: () => ({ data: null, error: new Error(errorMessage) }) }) }),
-      limit: () => ({ data: null, error: new Error(errorMessage), single: () => ({ data: null, error: new Error(errorMessage) }) })
-    })
-  };
-};
-
-try {
-  console.log('Tentando inicializar Supabase com URL:', SUPABASE_URL);
-  
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    throw new Error('Credenciais do Supabase não configuradas');
-  }
-  
-  // Inicializa o cliente Supabase
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  console.log('Cliente Supabase inicializado com sucesso');
-  
-  // Teste de conexão
+// O cliente supabase já está importado do arquivo supabase.js
+// Teste de conexão em segundo plano
+setTimeout(() => {
   supabase.from('clients').select('count', { count: 'exact', head: true })
     .then(({ error }) => {
       if (error) {
@@ -50,10 +15,7 @@ try {
     .catch(err => {
       console.error('Exceção ao testar conexão com Supabase:', err);
     });
-} catch (error) {
-  console.error('Erro ao inicializar o cliente Supabase:', error);
-  supabase = createMockClient('Erro ao inicializar Supabase: ' + error.message);
-}
+}, 1000);
 
 export { supabase };
 

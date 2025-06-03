@@ -1,4 +1,5 @@
 // api.js - Funções para integração com API e sincronização de dados
+import { supabase } from './supabase';
 import { 
   getWorkingDays, 
   updateWorkingDays, 
