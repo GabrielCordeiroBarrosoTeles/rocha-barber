@@ -199,14 +199,6 @@ npm run preview
 
 ---
 
-## 🔐 Acesso ao Painel Administrativo
-
-* URL: `/#/admin`
-* Usuário: `admin`
-* Senha: `barber2024`
-
----
-
 ## 💅 Guia de Estilização
 
 ### Modais
