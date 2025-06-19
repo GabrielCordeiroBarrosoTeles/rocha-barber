@@ -2,6 +2,108 @@
 
 Um sistema completo para barbearias que desejam elevar sua organização, atendimento e fidelização de clientes com planos mensais e gestão facilitada.
 
+## Arquitetura do Sistema
+
+```mermaid
+flowchart TD
+    style U fill:#e1f5fe, color:#01579b
+    style F fill:#f3e5f5, color:#4a148c
+    style C fill:#e8f5e8, color:#1b5e20
+    style S fill:#fff3e0, color:#e65100
+    style D fill:#ffebee, color:#b71c1c
+    style R fill:#f1f8e9, color:#33691e
+
+    %% Camadas da Aplicação
+    subgraph U[👤 Interface do Usuário]
+        H[Header/Navegação]
+        HP[HomePage]
+        AG[Página de Agendamento]
+        AD[Painel Admin]
+    end
+
+    subgraph F[🎨 Frontend Components]
+        HC[Hero Component]
+        SC[Services Component]
+        AB[About Component]
+        CT[Contact Component]
+        FT[Footer Component]
+        UI[UI Components<br/>Button, Input, Card, etc.]
+    end
+
+    subgraph C[⚙️ Core Logic]
+        AP[Appointments Logic]
+        PL[Plans Management]
+        DH[Date Helper]
+        AU[Auth Service]
+    end
+
+    subgraph S[💾 Storage Layer]
+        LS[localStorage]
+        SB[Supabase Database]
+        DB[Database Service]
+    end
+
+    subgraph D[📊 Data Models]
+        CL[Clients]
+        APP[Appointments]
+        CP[Client Plans]
+        WD[Working Days]
+        TS[Time Slots]
+    end
+
+    subgraph R[🌐 Routes & Navigation]
+        MR[Main Routes<br/>/, /admin, /agendamento]
+        RR[React Router]
+    end
+
+    %% Fluxo de Dados Principal
+    U --> F
+    F --> C
+    C --> S
+    S --> D
+
+    %% Conexões específicas
+    HP --> SC
+    SC --> AG
+    AG --> AP
+    AP --> PL
+    AP --> DB
+    DB --> SB
+    DB --> LS
+
+    %% Admin Flow
+    AD --> AU
+    AU --> DB
+    AD --> AP
+    AD --> PL
+
+    %% Data Flow
+    SB --> CL
+    SB --> APP
+    SB --> CP
+    LS --> WD
+    LS --> TS
+
+    %% Navigation
+    R --> U
+    RR --> HP
+    RR --> AG
+    RR --> AD
+
+    %% Styling
+    classDef primary fill:#3d85c6,stroke:#1c4587,color:white
+    classDef secondary fill:#93c47d,stroke:#6aa84f,color:white
+    classDef accent fill:#f6b26b,stroke:#e69138,color:black
+    classDef data fill:#e06666,stroke:#cc0000,color:white
+    classDef storage fill:#8e7cc3,stroke:#674ea7,color:white
+
+    class H,HP,AG,AD primary
+    class HC,SC,AB,CT,FT secondary
+    class AP,PL,DH,AU accent
+    class CL,APP,CP,WD,TS data
+    class LS,SB,DB storage
+```
+
 ---
 
 ## 📌 Visão Geral
