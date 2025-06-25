@@ -12,6 +12,7 @@ flowchart TD
     style S fill:#fff3e0, color:#e65100
     style D fill:#ffebee, color:#b71c1c
     style R fill:#f1f8e9, color:#33691e
+    style N fill:#e3f2fd, color:#0d47a1
 
     %% Camadas da Aplicação
     subgraph U[👤 Interface do Usuário]
@@ -19,11 +20,12 @@ flowchart TD
         HP[HomePage]
         AG[Página de Agendamento]
         AD[Painel Admin]
+        AH[Aba Histórico]
     end
 
     subgraph F[🎨 Frontend Components]
         HC[Hero Component]
-        SC[Services Component]
+        SC[Services Component - 4 Cards]
         AB[About Component]
         CT[Contact Component]
         FT[Footer Component]
@@ -35,6 +37,8 @@ flowchart TD
         PL[Plans Management]
         DH[Date Helper]
         AU[Auth Service]
+        TL[Time Logic<br/>30min vs 1hour]
+        CS[Consecutive Slots]
     end
 
     subgraph S[💾 Storage Layer]
@@ -49,11 +53,18 @@ flowchart TD
         CP[Client Plans]
         WD[Working Days]
         TS[Time Slots]
+        SV[Services<br/>Corte, Barba, Corte+Barba, Plano]
     end
 
     subgraph R[🌐 Routes & Navigation]
         MR[Main Routes<br/>/, /admin, /agendamento]
         RR[React Router]
+    end
+
+    subgraph N[📧 Notification System]
+        EM[Email API]
+        FM[Formspree/EmailJS]
+        LG[Vercel Logs]
     end
 
     %% Fluxo de Dados Principal
@@ -66,6 +77,8 @@ flowchart TD
     HP --> SC
     SC --> AG
     AG --> AP
+    AP --> TL
+    TL --> CS
     AP --> PL
     AP --> DB
     DB --> SB
@@ -75,7 +88,14 @@ flowchart TD
     AD --> AU
     AU --> DB
     AD --> AP
+    AD --> AH
     AD --> PL
+
+    %% Notification Flow
+    AP --> N
+    N --> EM
+    EM --> FM
+    EM --> LG
 
     %% Data Flow
     SB --> CL
@@ -83,6 +103,7 @@ flowchart TD
     SB --> CP
     LS --> WD
     LS --> TS
+    SV --> SC
 
     %% Navigation
     R --> U
@@ -90,18 +111,24 @@ flowchart TD
     RR --> AG
     RR --> AD
 
+    %% Service Logic
+    SC --> SV
+    SV --> TL
+
     %% Styling
     classDef primary fill:#3d85c6,stroke:#1c4587,color:white
     classDef secondary fill:#93c47d,stroke:#6aa84f,color:white
     classDef accent fill:#f6b26b,stroke:#e69138,color:black
     classDef data fill:#e06666,stroke:#cc0000,color:white
     classDef storage fill:#8e7cc3,stroke:#674ea7,color:white
+    classDef notification fill:#4fc3f7,stroke:#0288d1,color:white
 
-    class H,HP,AG,AD primary
+    class H,HP,AG,AD,AH primary
     class HC,SC,AB,CT,FT secondary
-    class AP,PL,DH,AU accent
-    class CL,APP,CP,WD,TS data
+    class AP,PL,DH,AU,TL,CS accent
+    class CL,APP,CP,WD,TS,SV data
     class LS,SB,DB storage
+    class EM,FM,LG notification
 ```
 
 ---
@@ -113,10 +140,13 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
 ### 🔑 Principais Recursos
 
 * Agendamento de serviços online
+* **4 tipos de serviços**: Corte (R$ 25), Barba (R$ 15), Corte + Barba (R$ 40), Plano Mensal (R$ 100)
 * Planos mensais com controle de uso
+* **Serviços de 1 hora**: Plano Mensal e Corte + Barba ocupam 2 slots consecutivos
 * Gerenciamento de dias e horários de funcionamento
-* Painel administrativo seguro
+* Painel administrativo seguro com histórico separado
 * Interface responsiva (mobile-first)
+* Sistema de notificação por email
 
 ---
 
@@ -124,8 +154,14 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
 
 ### 🗓️ Agendamento de Serviços
 
-* Escolha do serviço desejado
-* Seleção de data e horário disponíveis
+* **4 tipos de serviços disponíveis**:
+  - Corte de Cabelo (R$ 25,00) - 30 minutos
+  - Barba (R$ 15,00) - 30 minutos  
+  - Corte + Barba (R$ 40,00) - 1 hora
+  - Plano Mensal (R$ 100,00) - 1 hora por atendimento
+* **Lógica inteligente de horários**:
+  - Serviços de 30 min: ocupam 1 slot
+  - Serviços de 1 hora: requerem 2 slots consecutivos disponíveis
 * Verificação automática de disponibilidade
 * Suporte a planos mensais e agendamentos avulsos
 * Interface intuitiva e adaptável a todos os dispositivos
@@ -140,11 +176,17 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
 
 ### 📊 Painel Administrativo
 
+* **Abas organizadas**:
+  - Agendamentos (hoje e futuros)
+  - Histórico (agendamentos passados)
+  - Planos Mensais (controle de uso)
+  - Configurações (dias e horários)
 * Gerenciamento completo dos agendamentos
+* Exclusão com lógica de planos mensais (+1 agendamento ao excluir)
 * Configuração de dias e horários de funcionamento
 * Monitoramento do uso dos planos mensais
-* Exportação e importação de dados
 * Autenticação segura de administradores
+* Sistema de notificação por email para novos agendamentos
 
 ---
 
@@ -174,6 +216,21 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
 
 ---
 
+## 📧 Sistema de Notificação
+
+### Notificação por Email
+* Email automático para `gabrielpikachuoficial@gmail.com` a cada novo agendamento
+* Dados enviados: nome, telefone, serviço, preço, data, horário, tipo de plano
+* Logs sempre funcionam no Vercel Dashboard > Functions > Logs
+* Configuração opcional via EmailJS ou Formspree
+
+### Como Configurar
+1. **Formspree** (recomendado): Criar conta em formspree.io
+2. **EmailJS**: Configurar service_id, template_id e user_id
+3. **Logs**: Sempre disponíveis no Vercel para monitoramento
+
+---
+
 ## 🚀 Melhorias Implementadas
 
 ### ✅ Verificação de Disponibilidade
@@ -198,6 +255,15 @@ O **Rocha Barber** é uma plataforma moderna e responsiva de agendamentos online
 * Renovação mensal automática
 * Reversão automática em caso de cancelamento
 * Histórico detalhado para o cliente
+* **Lógica de exclusão**: Ao excluir agendamento de plano mensal, +1 agendamento é devolvido
+
+### ⏰ Sistema de Horários Inteligente
+
+* **Serviços de 30 minutos**: Corte e Barba ocupam 1 slot
+* **Serviços de 1 hora**: Plano Mensal e Corte + Barba
+  - Verificam 2 slots consecutivos disponíveis
+  - Bloqueiam automaticamente ambos os horários
+  - Exemplo: agendamento às 14:00 bloqueia 14:00 e 14:30
 
 ### 📱 Design Mobile-First
 

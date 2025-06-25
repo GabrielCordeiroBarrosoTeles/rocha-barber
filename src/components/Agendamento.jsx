@@ -112,34 +112,50 @@ export default function Agendamento() {
     }
   };
 
+  // Função para verificar horários consecutivos para serviços de 1 hora
+  const findConsecutiveSlots = (timeSlots, bookedTimes) => {
+    const availableConsecutive = [];
+    
+    for (let i = 0; i < timeSlots.length - 1; i++) {
+      const currentTime = timeSlots[i];
+      const nextTime = timeSlots[i + 1];
+      
+      // Verificar se são horários consecutivos (30 min de diferença)
+      const currentMinutes = parseInt(currentTime.split(':')[0]) * 60 + parseInt(currentTime.split(':')[1]);
+      const nextMinutes = parseInt(nextTime.split(':')[0]) * 60 + parseInt(nextTime.split(':')[1]);
+      
+      if (nextMinutes - currentMinutes === 30) {
+        // Verificar se ambos os horários estão livres
+        if (!bookedTimes.includes(currentTime) && !bookedTimes.includes(nextTime)) {
+          availableConsecutive.push(currentTime);
+        }
+      }
+    }
+    
+    return availableConsecutive;
+  };
+
   // Atualizar horários disponíveis quando a data for selecionada
   useEffect(() => {
     const loadAvailableTimes = async () => {
       if (date) {
         try {
-          // Obter o dia da semana de forma confiável
           const dayOfWeek = getDayOfWeek(date);
-          
-          // Obter configurações de dias de trabalho do localStorage
           const workingDaysConfig = JSON.parse(localStorage.getItem('workingDays') || JSON.stringify(workingDays));
           
-          // Verificar se o dia está disponível
           if (workingDaysConfig[dayOfWeek] !== true) {
             setAvailableTimes([]);
-            // Obter o nome do dia da semana
             const dayName = getDayName(dayOfWeek);
             setMessage(`Este dia não está disponível para agendamentos (${dayName}).`);
             return;
           }
           
-          // Obtém os horários disponíveis diretamente do localStorage
           let timeSlots = [];
           const localTimeSlots = localStorage.getItem('timeSlots');
           
           if (localTimeSlots) {
             timeSlots = JSON.parse(localTimeSlots);
           } else {
-            // Valores padrão
             timeSlots = [
               "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", 
               "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", 
@@ -148,30 +164,52 @@ export default function Agendamento() {
             ];
           }
           
-          // Verifica cada horário individualmente para garantir disponibilidade
-          const available = [];
+          // Verificar se é serviço de 1 hora
+          const isOneHourService = selectedService?.duration === 60;
           
-          // Verifica cada horário individualmente para garantir disponibilidade
-          for (const time of timeSlots) {
-            // Verifica a disponibilidade usando a função robusta
-            const isAvailable = await checkTimeAvailability(date, time);
-            if (isAvailable) {
-              available.push(time);
+          if (isOneHourService) {
+            // Para serviços de 1 hora, buscar horários consecutivos
+            const bookedTimes = [];
+            
+            // Verificar quais horários já estão ocupados
+            for (const time of timeSlots) {
+              const isAvailable = await checkTimeAvailability(date, time);
+              if (!isAvailable) {
+                bookedTimes.push(time);
+              }
             }
-          }
-          
-          // Organiza os horários em ordem crescente
-          available.sort((a, b) => {
-            const timeA = a.split(':').map(Number);
-            const timeB = b.split(':').map(Number);
-            return (timeA[0] * 60 + timeA[1]) - (timeB[0] * 60 + timeB[1]);
-          });
-          
-          setAvailableTimes(available);
-          if (available.length === 0) {
-            setMessage('Não há horários disponíveis nesta data.');
+            
+            const consecutiveSlots = findConsecutiveSlots(timeSlots, bookedTimes);
+            setAvailableTimes(consecutiveSlots);
+            
+            if (consecutiveSlots.length === 0) {
+              setMessage('Não há horários consecutivos disponíveis para este serviço (1 hora) nesta data.');
+            } else {
+              setMessage('');
+            }
           } else {
-            setMessage('');
+            // Para serviços normais (30 min)
+            const available = [];
+            
+            for (const time of timeSlots) {
+              const isAvailable = await checkTimeAvailability(date, time);
+              if (isAvailable) {
+                available.push(time);
+              }
+            }
+            
+            available.sort((a, b) => {
+              const timeA = a.split(':').map(Number);
+              const timeB = b.split(':').map(Number);
+              return (timeA[0] * 60 + timeA[1]) - (timeB[0] * 60 + timeB[1]);
+            });
+            
+            setAvailableTimes(available);
+            if (available.length === 0) {
+              setMessage('Não há horários disponíveis nesta data.');
+            } else {
+              setMessage('');
+            }
           }
         } catch (error) {
           console.error('Erro ao carregar horários disponíveis:', error);
@@ -181,7 +219,7 @@ export default function Agendamento() {
     };
     
     loadAvailableTimes();
-  }, [date]);
+  }, [date, selectedService]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -323,6 +361,29 @@ export default function Agendamento() {
           
           if (!result || !result.id) {
             throw new Error('Falha ao salvar o agendamento no banco de dados');
+          }
+          
+          // Para serviços de 1 hora, salvar o próximo horário também
+          if (selectedService?.duration === 60) {
+            const currentTimeMinutes = parseInt(time.split(':')[0]) * 60 + parseInt(time.split(':')[1]);
+            const nextTimeMinutes = currentTimeMinutes + 30;
+            const nextTimeHour = Math.floor(nextTimeMinutes / 60);
+            const nextTimeMin = nextTimeMinutes % 60;
+            const nextTime = `${nextTimeHour.toString().padStart(2, '0')}:${nextTimeMin.toString().padStart(2, '0')}`;
+            
+            const nextAppointment = {
+              ...appointment,
+              time: nextTime,
+              service: appointment.service + ' (Parte 2)',
+              is_continuation: true
+            };
+            
+            try {
+              await addAppointment(nextAppointment);
+              console.log('Horário seguinte bloqueado:', nextTime);
+            } catch (error) {
+              console.error('Erro ao bloquear horário seguinte:', error);
+            }
           }
           
           // Remover modal de confirmação

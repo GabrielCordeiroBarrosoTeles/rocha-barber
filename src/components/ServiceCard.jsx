@@ -12,11 +12,15 @@ export default function ServiceCard({
 }) {
   console.log('Renderizando card com imagem:', imageSrc);
   const handleClick = () => {
+    // Determinar se é serviço de 1 hora
+    const isOneHourService = title === 'Plano Mensal' || title === 'Corte + Barba';
+    
     // Salva o serviço selecionado no localStorage
     const serviceData = {
       title,
       price,
-      description
+      description,
+      duration: isOneHourService ? 60 : 30 // em minutos
     };
     
     try {
