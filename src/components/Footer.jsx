@@ -1,7 +1,7 @@
 export default function Footer() {
   const currentYear = new Date().getFullYear()
   const whatsappNumber = "558596988973"
-  const instagramUrl = "https://www.instagram.com/leonidas_barbeiro?igsh=d202NXdyNnh0ZHYw"
+  const instagramUrl = "https://www.instagram.com/rocha_barberll"
   
   return (
     <footer className="w-full py-8 bg-zinc-900 text-white">
