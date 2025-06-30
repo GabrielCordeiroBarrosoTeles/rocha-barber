@@ -215,6 +215,11 @@ export default function Admin() {
     // Cria um modal de confirmação personalizado
     const appointment = appointments[index];
     
+    // Se for um agendamento consolidado, precisamos excluir ambos
+    const appointmentsToDelete = appointment.isConsolidated 
+      ? appointment.originalIds.map(id => allAppointments.find(app => app.id === id)).filter(Boolean)
+      : [appointment];
+    
     // Cria um elemento div para o modal
     const modalOverlay = document.createElement('div');
     modalOverlay.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm';
@@ -297,19 +302,22 @@ export default function Admin() {
           const { supabase } = await import('../lib/supabase-direct');
           
           // Exclui diretamente do banco de dados
-          const { error } = await supabase
-            .from('appointments')
-            .delete()
-            .eq('id', appointment.id);
-          
-          if (error) {
-            console.error('Erro ao excluir agendamento do Supabase:', error);
-            throw error;
+          for (const appointmentToDelete of appointmentsToDelete) {
+            const { error } = await supabase
+              .from('appointments')
+              .delete()
+              .eq('id', appointmentToDelete.id);
+            
+            if (error) {
+              console.error('Erro ao excluir agendamento do Supabase:', error);
+              throw error;
+            }
           }
           
           // Atualiza o localStorage
           const localAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-          const updatedLocalAppointments = localAppointments.filter(app => app.id !== appointment.id);
+          const idsToRemove = appointmentsToDelete.map(app => app.id);
+          const updatedLocalAppointments = localAppointments.filter(app => !idsToRemove.includes(app.id));
           localStorage.setItem('appointments', JSON.stringify(updatedLocalAppointments));
           
           // Atualiza a lista local
@@ -318,21 +326,23 @@ export default function Admin() {
           setAppointments(updatedAppointments);
           
           // Atualiza também a lista completa
-          const updatedAllAppointments = allAppointments.filter(app => app.id !== appointment.id);
+          const updatedAllAppointments = allAppointments.filter(app => !idsToRemove.includes(app.id));
           setAllAppointments(updatedAllAppointments);
           
           // Exibe mensagem de sucesso
+          const isMonthlyPlan = appointmentsToDelete.some(app => app.planType === PLANS.MONTHLY);
           setMessage('Agendamento excluído com sucesso' + 
-            (appointment.planType === PLANS.MONTHLY ? ' e +1 agendamento adicionado ao plano do cliente.' : '.'));
+            (isMonthlyPlan ? ' e +1 agendamento adicionado ao plano do cliente.' : '.'));
           
           // Se for plano mensal, incrementa o contador de agendamentos restantes
-          if (appointment.planType === PLANS.MONTHLY) {
+          const monthlyAppointment = appointmentsToDelete.find(app => app.planType === PLANS.MONTHLY);
+          if (monthlyAppointment) {
             try {
               // Busca o cliente
               const { data: clientData } = await supabase
                 .from('clients')
                 .select('id')
-                .eq('name', appointment.name)
+                .eq('name', monthlyAppointment.name)
                 .single();
               
               if (clientData) {
@@ -370,7 +380,8 @@ export default function Admin() {
           // Tenta remover diretamente do localStorage como fallback
           try {
             const localAppointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-            const updatedAppointments = localAppointments.filter(app => app.id !== appointment.id);
+            const idsToRemove = appointmentsToDelete.map(app => app.id);
+            const updatedAppointments = localAppointments.filter(app => !idsToRemove.includes(app.id));
             localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
             
             // Atualiza a lista local
@@ -379,7 +390,7 @@ export default function Admin() {
             setAppointments(updatedAppointmentsList);
             
             // Atualiza também a lista completa
-            const updatedAllAppointments = allAppointments.filter(app => app.id !== appointment.id);
+            const updatedAllAppointments = allAppointments.filter(app => !idsToRemove.includes(app.id));
             setAllAppointments(updatedAllAppointments);
             
             setMessage('Agendamento excluído com sucesso (modo offline).');
@@ -429,25 +440,70 @@ export default function Admin() {
     }
   };
 
+  // Função para consolidar agendamentos de plano mensal
+  const consolidateAppointments = (appointments) => {
+    const consolidated = [];
+    const processed = new Set();
+    
+    appointments.forEach((appointment, index) => {
+      if (processed.has(appointment.id)) return;
+      
+      if (appointment.planType === PLANS.MONTHLY) {
+        const nextAppointment = appointments.find((next, nextIndex) => 
+          nextIndex > index &&
+          next.name === appointment.name &&
+          next.date === appointment.date &&
+          next.planType === PLANS.MONTHLY &&
+          next.service.includes('(Parte 2)') &&
+          !processed.has(next.id)
+        );
+        
+        if (nextAppointment) {
+          consolidated.push({
+            ...appointment,
+            service: appointment.service.replace(' (Parte 2)', ''),
+            time: `${appointment.time} - ${nextAppointment.time}`,
+            isConsolidated: true,
+            originalIds: [appointment.id, nextAppointment.id]
+          });
+          processed.add(appointment.id);
+          processed.add(nextAppointment.id);
+        } else {
+          consolidated.push(appointment);
+          processed.add(appointment.id);
+        }
+      } else {
+        consolidated.push(appointment);
+        processed.add(appointment.id);
+      }
+    });
+    
+    return consolidated;
+  };
+
   // Função para filtrar agendamentos por data
   const filterAppointmentsByDate = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    return allAppointments.filter(appointment => {
+    const futureAppointments = allAppointments.filter(appointment => {
       const appointmentDate = new Date(appointment.date + 'T00:00:00');
       return appointmentDate >= today;
     });
+    
+    return consolidateAppointments(futureAppointments);
   };
 
   const getHistoryAppointments = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    return allAppointments.filter(appointment => {
+    const pastAppointments = allAppointments.filter(appointment => {
       const appointmentDate = new Date(appointment.date + 'T00:00:00');
       return appointmentDate < today;
     });
+    
+    return consolidateAppointments(pastAppointments);
   };
 
   if (!isAuthenticated) {
@@ -603,9 +659,11 @@ export default function Admin() {
                         </thead>
                         <tbody className="bg-white divide-y divide-zinc-200">
                           {futureAppointments.map((appointment, index) => {
-                            const originalIndex = allAppointments.findIndex(app => app.id === appointment.id);
+                            const originalIndex = appointment.isConsolidated 
+                              ? allAppointments.findIndex(app => app.id === appointment.originalIds[0])
+                              : allAppointments.findIndex(app => app.id === appointment.id);
                             return (
-                              <tr key={index} className="admin-table-row">
+                              <tr key={appointment.isConsolidated ? `consolidated-${appointment.originalIds.join('-')}` : appointment.id} className="admin-table-row">
                                 <td className="admin-table-cell">
                                   <div className="font-medium text-zinc-900">{appointment.name}</div>
                                   {appointment.phone && (
@@ -709,9 +767,11 @@ export default function Admin() {
                         </thead>
                         <tbody className="bg-white divide-y divide-zinc-200">
                           {historyAppointments.map((appointment, index) => {
-                            const originalIndex = allAppointments.findIndex(app => app.id === appointment.id);
+                            const originalIndex = appointment.isConsolidated 
+                              ? allAppointments.findIndex(app => app.id === appointment.originalIds[0])
+                              : allAppointments.findIndex(app => app.id === appointment.id);
                             return (
-                              <tr key={index} className="admin-table-row opacity-75">
+                              <tr key={appointment.isConsolidated ? `consolidated-${appointment.originalIds.join('-')}` : appointment.id} className="admin-table-row opacity-75">
                                 <td className="admin-table-cell">
                                   <div className="font-medium text-zinc-700">{appointment.name}</div>
                                   {appointment.phone && (

@@ -244,16 +244,42 @@ export async function getClientMonthlyStats() {
         }
       }
       
-      // Formatar os agendamentos para exibição
-      const formattedAppointments = clientAppointments.map(app => ({
-        id: app.id,
-        date: app.date,
-        time: app.time,
-        service: app.service
-      }));
+      // Consolidar agendamentos sequenciais
+      const consolidatedAppointments = [];
+      const processed = new Set();
       
-      // Usar o número real de agendamentos
-      const usedAppointments = clientAppointments.length;
+      clientAppointments.forEach((appointment, index) => {
+        if (processed.has(appointment.id)) return;
+        
+        const nextAppointment = clientAppointments.find((next, nextIndex) => 
+          nextIndex > index &&
+          next.date === appointment.date &&
+          next.service.includes('(Parte 2)') &&
+          !processed.has(next.id)
+        );
+        
+        if (nextAppointment) {
+          consolidatedAppointments.push({
+            id: appointment.id,
+            date: appointment.date,
+            time: `${appointment.time} - ${nextAppointment.time}`,
+            service: appointment.service.replace(' (Parte 2)', '')
+          });
+          processed.add(appointment.id);
+          processed.add(nextAppointment.id);
+        } else {
+          consolidatedAppointments.push({
+            id: appointment.id,
+            date: appointment.date,
+            time: appointment.time,
+            service: appointment.service
+          });
+          processed.add(appointment.id);
+        }
+      });
+      
+      const formattedAppointments = consolidatedAppointments;
+      const usedAppointments = consolidatedAppointments.length;
       
       // Calcular cortes restantes com base no total menos os usados
       const remaining = PLAN_CONFIG[PLANS.MONTHLY].maxAppointments - usedAppointments;
