@@ -170,7 +170,7 @@ export default function Admin() {
     }
   };
 
-  const addTimeSlot = async () => {
+  const addTimeSlot = () => {
     if (!newTimeSlot) return;
     
     // Validar formato de hora (HH:MM)
@@ -186,44 +186,35 @@ export default function Admin() {
       return;
     }
     
-    try {
-      const updatedTimeSlots = [...timeSlots, newTimeSlot].sort();
-      setTimeSlots(updatedTimeSlots);
-      
-      // Importa e usa a função updateTimeSlots para salvar no banco
-      const { updateTimeSlots } = await import('../lib/database');
-      const success = await updateTimeSlots(updatedTimeSlots);
-      
-      setNewTimeSlot('');
-      
-      if (success) {
-        setMessage('Horário adicionado com sucesso');
-      } else {
-        setMessage('Horário adicionado localmente. Verifique sua conexão para sincronizar com o banco.');
-      }
-    } catch (error) {
-      console.error('Erro ao adicionar horário:', error);
-      setMessage('Erro ao salvar horário. Tente novamente.');
-    }
+    const updatedTimeSlots = [...timeSlots, newTimeSlot].sort();
+    setTimeSlots(updatedTimeSlots);
+    localStorage.setItem('timeSlots', JSON.stringify(updatedTimeSlots));
+    setNewTimeSlot('');
+    setMessage('Horário adicionado. Clique em "Salvar Alterações" para sincronizar com o banco.');
   };
 
-  const removeTimeSlot = async (slot) => {
+  const removeTimeSlot = (slot) => {
+    const updatedTimeSlots = timeSlots.filter(time => time !== slot);
+    setTimeSlots(updatedTimeSlots);
+    localStorage.setItem('timeSlots', JSON.stringify(updatedTimeSlots));
+    setMessage(`Horário ${slot} removido. Clique em "Salvar Alterações" para sincronizar com o banco.`);
+  };
+
+  const saveTimeSlots = async () => {
     try {
-      const updatedTimeSlots = timeSlots.filter(time => time !== slot);
-      setTimeSlots(updatedTimeSlots);
+      console.log('Iniciando salvamento dos horários:', timeSlots);
       
-      // Importa e usa a função updateTimeSlots para salvar no banco
       const { updateTimeSlots } = await import('../lib/database');
-      const success = await updateTimeSlots(updatedTimeSlots);
+      const success = await updateTimeSlots(timeSlots);
       
       if (success) {
-        setMessage(`Horário ${slot} removido com sucesso.`);
+        setMessage('Horários salvos no banco de dados com sucesso!');
       } else {
-        setMessage(`Horário ${slot} removido localmente. Verifique sua conexão para sincronizar com o banco.`);
+        setMessage('Erro ao salvar no banco. Horários mantidos localmente.');
       }
     } catch (error) {
-      console.error('Erro ao remover horário:', error);
-      setMessage('Erro ao remover horário. Tente novamente.');
+      console.error('Erro ao salvar horários:', error);
+      setMessage('Erro ao salvar horários. Tente novamente.');
     }
   };
 
@@ -1209,7 +1200,7 @@ export default function Admin() {
                         )}
                       </div>
                       
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-4">
                         {timeSlots.sort().map((slot) => (
                           <div 
                             key={slot} 
@@ -1227,6 +1218,15 @@ export default function Admin() {
                             </button>
                           </div>
                         ))}
+                      </div>
+                      
+                      <div className="pt-4 border-t border-zinc-200">
+                        <Button 
+                          onClick={saveTimeSlots}
+                          className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                        >
+                          Salvar Alterações no Banco
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>

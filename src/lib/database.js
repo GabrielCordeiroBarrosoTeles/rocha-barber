@@ -131,15 +131,16 @@ export async function getTimeSlots() {
   try {
     // Primeiro tenta obter do Supabase
     const { data, error } = await supabase
-      .from('app_data')
-      .select('data')
-      .eq('key', 'timeSlots')
-      .single();
+      .from('time_slots')
+      .select('time_value')
+      .eq('is_active', true)
+      .order('time_value');
     
-    if (!error && data) {
+    if (!error && data && data.length > 0) {
+      const timeSlots = data.map(row => row.time_value);
       // Salva no localStorage para acesso offline
-      localStorage.setItem('timeSlots', JSON.stringify(data.data));
-      return data.data;
+      localStorage.setItem('timeSlots', JSON.stringify(timeSlots));
+      return timeSlots;
     }
     
     // Se não encontrar no Supabase, tenta localStorage
@@ -180,20 +181,30 @@ export async function getTimeSlots() {
 // Função para atualizar os horários disponíveis
 export async function updateTimeSlots(slots) {
   try {
+    console.log('updateTimeSlots chamada com:', slots);
+    
     // Salva no localStorage primeiro para garantir acesso offline
     localStorage.setItem('timeSlots', JSON.stringify(slots));
     
-    // Tenta salvar no Supabase usando a tabela app_data
-    const { error } = await supabase
-      .from('app_data')
-      .upsert({ 
-        key: 'timeSlots', 
-        data: slots 
-      });
+    // Primeiro, desativa todos os horários existentes
+    await supabase
+      .from('time_slots')
+      .update({ is_active: false })
+      .neq('id', 0); // Atualiza todos
     
-    if (error) {
-      console.error('Erro ao atualizar horários no Supabase:', error);
-      return false;
+    // Depois, insere/ativa os horários da lista
+    for (const timeValue of slots) {
+      const { error } = await supabase
+        .from('time_slots')
+        .upsert({ 
+          time_value: timeValue,
+          is_active: true 
+        }, { onConflict: 'time_value' });
+      
+      if (error) {
+        console.error('Erro ao salvar horário', timeValue, ':', error);
+        return false;
+      }
     }
     
     console.log('Horários salvos no banco com sucesso');
