@@ -24,41 +24,51 @@ export { supabase };
 // Função para obter os dias de trabalho
 export async function getWorkingDays() {
   try {
-    // Primeiro tenta obter do localStorage para garantir resposta rápida
+    // Primeiro tenta obter do Supabase
+    const { data, error } = await supabase
+      .from('working_days')
+      .select('day_of_week, is_working');
+    
+    if (!error && data && data.length > 0) {
+      // Converte os dados para o formato esperado
+      const workingDays = {};
+      data.forEach(row => {
+        workingDays[row.day_of_week] = row.is_working;
+      });
+      
+      // Preenche dias que não existem na tabela com valores padrão
+      for (let i = 0; i <= 6; i++) {
+        if (workingDays[i] === undefined) {
+          workingDays[i] = i >= 1 && i <= 5; // Segunda a sexta = true, resto = false
+        }
+      }
+      
+      // Salva no localStorage para acesso offline
+      localStorage.setItem('workingDays', JSON.stringify(workingDays));
+      return workingDays;
+    }
+    
+    // Se não encontrar no Supabase, tenta localStorage
     const localWorkingDays = localStorage.getItem('workingDays');
     if (localWorkingDays) {
       return JSON.parse(localWorkingDays);
     }
     
-    // Se não encontrar no localStorage, tenta obter do Supabase
-    const { data, error } = await supabase
-      .from('working_days')
-      .select('*')
-      .single();
+    // Valores padrão
+    const defaultWorkingDays = {
+      0: false, // Domingo
+      1: true,  // Segunda
+      2: true,  // Terça
+      3: true,  // Quarta
+      4: true,  // Quinta
+      5: true,  // Sexta
+      6: false  // Sábado
+    };
     
-    if (error) {
-      console.error('Erro ao obter dias de trabalho:', error);
-      // Valores padrão
-      const defaultWorkingDays = {
-        0: false, // Domingo
-        1: true,  // Segunda
-        2: true,  // Terça
-        3: true,  // Quarta
-        4: true,  // Quinta
-        5: true,  // Sexta
-        6: false  // Sábado
-      };
-      
-      // Salva os valores padrão no localStorage
-      localStorage.setItem('workingDays', JSON.stringify(defaultWorkingDays));
-      
-      return defaultWorkingDays;
-    }
+    // Salva os valores padrão no localStorage
+    localStorage.setItem('workingDays', JSON.stringify(defaultWorkingDays));
     
-    // Salva no localStorage para acesso offline
-    localStorage.setItem('workingDays', JSON.stringify(data.days));
-    
-    return data.days;
+    return defaultWorkingDays;
   } catch (error) {
     console.error('Erro ao obter dias de trabalho:', error);
     // Valores padrão
@@ -82,22 +92,36 @@ export async function getWorkingDays() {
 // Função para atualizar os dias de trabalho
 export async function updateWorkingDays(days) {
   try {
+    console.log('updateWorkingDays chamada com:', days);
+    
     // Salva no localStorage primeiro para garantir acesso offline
     localStorage.setItem('workingDays', JSON.stringify(days));
+    console.log('Salvo no localStorage');
     
-    // Tenta salvar no Supabase
-    const { error } = await supabase
-      .from('working_days')
-      .upsert({ id: 1, days });
+    // Converte o objeto days para o formato da tabela working_days
+    const workingDaysData = Object.keys(days).map(dayOfWeek => ({
+      day_of_week: parseInt(dayOfWeek),
+      is_working: days[dayOfWeek]
+    }));
     
-    if (error) {
-      console.error('Erro ao atualizar dias de trabalho no Supabase:', error);
-      return false;
+    console.log('Dados convertidos:', workingDaysData);
+    
+    // Salva cada dia na tabela working_days
+    for (const dayData of workingDaysData) {
+      const { error } = await supabase
+        .from('working_days')
+        .upsert(dayData, { onConflict: 'day_of_week' });
+      
+      if (error) {
+        console.error('Erro ao salvar dia', dayData.day_of_week, ':', error);
+        return false;
+      }
     }
     
+    console.log('Dias de trabalho salvos no banco com sucesso');
     return true;
   } catch (error) {
-    console.error('Erro ao atualizar dias de trabalho:', error);
+    console.error('Exceção ao atualizar dias de trabalho:', error);
     return false;
   }
 }
@@ -105,38 +129,37 @@ export async function updateWorkingDays(days) {
 // Função para obter os horários disponíveis
 export async function getTimeSlots() {
   try {
-    // Primeiro tenta obter do localStorage para garantir resposta rápida
+    // Primeiro tenta obter do Supabase
+    const { data, error } = await supabase
+      .from('app_data')
+      .select('data')
+      .eq('key', 'timeSlots')
+      .single();
+    
+    if (!error && data) {
+      // Salva no localStorage para acesso offline
+      localStorage.setItem('timeSlots', JSON.stringify(data.data));
+      return data.data;
+    }
+    
+    // Se não encontrar no Supabase, tenta localStorage
     const localTimeSlots = localStorage.getItem('timeSlots');
     if (localTimeSlots) {
       return JSON.parse(localTimeSlots);
     }
     
-    // Se não encontrar no localStorage, tenta obter do Supabase
-    const { data, error } = await supabase
-      .from('time_slots')
-      .select('*')
-      .single();
+    // Valores padrão
+    const defaultTimeSlots = [
+      "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", 
+      "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", 
+      "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", 
+      "17:00", "17:30"
+    ];
     
-    if (error) {
-      console.error('Erro ao obter horários:', error);
-      // Valores padrão
-      const defaultTimeSlots = [
-        "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", 
-        "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", 
-        "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", 
-        "17:00", "17:30"
-      ];
-      
-      // Salva os valores padrão no localStorage
-      localStorage.setItem('timeSlots', JSON.stringify(defaultTimeSlots));
-      
-      return defaultTimeSlots;
-    }
+    // Salva os valores padrão no localStorage
+    localStorage.setItem('timeSlots', JSON.stringify(defaultTimeSlots));
     
-    // Salva no localStorage para acesso offline
-    localStorage.setItem('timeSlots', JSON.stringify(data.slots));
-    
-    return data.slots;
+    return defaultTimeSlots;
   } catch (error) {
     console.error('Erro ao obter horários:', error);
     // Valores padrão
@@ -160,16 +183,20 @@ export async function updateTimeSlots(slots) {
     // Salva no localStorage primeiro para garantir acesso offline
     localStorage.setItem('timeSlots', JSON.stringify(slots));
     
-    // Tenta salvar no Supabase
+    // Tenta salvar no Supabase usando a tabela app_data
     const { error } = await supabase
-      .from('time_slots')
-      .upsert({ id: 1, slots });
+      .from('app_data')
+      .upsert({ 
+        key: 'timeSlots', 
+        data: slots 
+      });
     
     if (error) {
       console.error('Erro ao atualizar horários no Supabase:', error);
       return false;
     }
     
+    console.log('Horários salvos no banco com sucesso');
     return true;
   } catch (error) {
     console.error('Erro ao atualizar horários:', error);

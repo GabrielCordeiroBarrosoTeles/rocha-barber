@@ -98,12 +98,12 @@ export default function Admin() {
 
   const loadSettings = async () => {
     try {
-      // Importa a função de sincronização
-      const { syncData } = await import('../lib/database');
+      // Importa as funções de carregamento
+      const { getWorkingDays, getTimeSlots } = await import('../lib/database');
       
-      // Carrega as configurações usando o novo sistema
-      const savedWorkingDays = await syncData('workingDays', workingDays);
-      const savedTimeSlots = await syncData('timeSlots', timeSlots);
+      // Carrega as configurações do banco de dados
+      const savedWorkingDays = await getWorkingDays();
+      const savedTimeSlots = await getTimeSlots();
       
       setWorkingDays(savedWorkingDays);
       setTimeSlots(savedTimeSlots);
@@ -140,25 +140,32 @@ export default function Admin() {
     localStorage.removeItem('adminAuthenticated');
   };
 
-  const toggleWorkingDay = async (day) => {
+  const toggleWorkingDay = (day) => {
+    const updatedWorkingDays = { ...workingDays, [day]: !workingDays[day] };
+    setWorkingDays(updatedWorkingDays);
+    localStorage.setItem('workingDays', JSON.stringify(updatedWorkingDays));
+  };
+
+  const saveWorkingDays = async () => {
     try {
-      const updatedWorkingDays = { ...workingDays, [day]: !workingDays[day] };
-      setWorkingDays(updatedWorkingDays);
+      console.log('Iniciando salvamento dos dias:', workingDays);
+      alert('Iniciando salvamento...');
       
-      // Salva diretamente no localStorage para garantir consistência
-      localStorage.setItem('workingDays', JSON.stringify(updatedWorkingDays));
+      const { updateWorkingDays } = await import('../lib/database');
+      const success = await updateWorkingDays(workingDays);
       
-      // Também tenta salvar no IndexedDB para persistência
-      try {
-        const { saveAndSync } = await import('../lib/database');
-        await saveAndSync('workingDays', updatedWorkingDays);
-      } catch (e) {
-        console.warn('Não foi possível salvar no IndexedDB, mas os dados foram salvos no localStorage:', e);
+      console.log('Resultado do salvamento:', success);
+      
+      if (success) {
+        alert('Dias salvos com sucesso!');
+        setMessage('Dias de funcionamento salvos no banco de dados com sucesso!');
+      } else {
+        alert('Erro ao salvar no banco!');
+        setMessage('Erro ao salvar no banco. Configurações mantidas localmente.');
       }
-      
-      setMessage(`${getDayName(day)} ${updatedWorkingDays[day] ? 'aberto' : 'fechado'} para agendamentos.`);
     } catch (error) {
-      console.error('Erro ao atualizar dias de funcionamento:', error);
+      console.error('Erro ao salvar dias de funcionamento:', error);
+      alert('Erro: ' + error.message);
       setMessage('Erro ao salvar configuração. Tente novamente.');
     }
   };
@@ -183,12 +190,17 @@ export default function Admin() {
       const updatedTimeSlots = [...timeSlots, newTimeSlot].sort();
       setTimeSlots(updatedTimeSlots);
       
-      // Importa a função de sincronização
-      const { saveAndSync } = await import('../lib/database');
-      await saveAndSync('timeSlots', updatedTimeSlots);
+      // Importa e usa a função updateTimeSlots para salvar no banco
+      const { updateTimeSlots } = await import('../lib/database');
+      const success = await updateTimeSlots(updatedTimeSlots);
       
       setNewTimeSlot('');
-      setMessage('Horário adicionado com sucesso');
+      
+      if (success) {
+        setMessage('Horário adicionado com sucesso');
+      } else {
+        setMessage('Horário adicionado localmente. Verifique sua conexão para sincronizar com o banco.');
+      }
     } catch (error) {
       console.error('Erro ao adicionar horário:', error);
       setMessage('Erro ao salvar horário. Tente novamente.');
@@ -200,11 +212,15 @@ export default function Admin() {
       const updatedTimeSlots = timeSlots.filter(time => time !== slot);
       setTimeSlots(updatedTimeSlots);
       
-      // Importa a função de sincronização
-      const { saveAndSync } = await import('../lib/database');
-      await saveAndSync('timeSlots', updatedTimeSlots);
+      // Importa e usa a função updateTimeSlots para salvar no banco
+      const { updateTimeSlots } = await import('../lib/database');
+      const success = await updateTimeSlots(updatedTimeSlots);
       
-      setMessage(`Horário ${slot} removido com sucesso.`);
+      if (success) {
+        setMessage(`Horário ${slot} removido com sucesso.`);
+      } else {
+        setMessage(`Horário ${slot} removido localmente. Verifique sua conexão para sincronizar com o banco.`);
+      }
     } catch (error) {
       console.error('Erro ao remover horário:', error);
       setMessage('Erro ao remover horário. Tente novamente.');
@@ -1159,6 +1175,15 @@ export default function Admin() {
                             </div>
                           </div>
                         ))}
+                        
+                        <div className="pt-4 border-t border-zinc-200">
+                          <Button 
+                            onClick={saveWorkingDays}
+                            className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                          >
+                            Salvar Alterações no Banco
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
