@@ -7,8 +7,15 @@ import {
 } from './database';
 
 // Configuração do Supabase - usando import.meta.env para Vite
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Fallback para valores hardcoded caso as variáveis não estejam definidas
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://nbwyzcpxzuixmxgecilb.supabase.co';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5id3l6Y3B4enVpeG14Z2VjaWxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgzMDkwOTcsImV4cCI6MjA2Mzg4NTA5N30.SjSSFQ9ZGfvHoTGSHkqxudLLlPH8m0vBGefUK8ef9IM';
+
+// Valida se as variáveis estão definidas
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('Erro: Variáveis de ambiente do Supabase não estão definidas!');
+  console.error('Certifique-se de que VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY estão no arquivo .env');
+}
 
 // Inicializa o cliente Supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
