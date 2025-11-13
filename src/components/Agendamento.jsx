@@ -5,6 +5,7 @@ import { Select } from "./ui/select";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { PLANS, PLAN_CONFIG, getClientPlan } from "../lib/plans";
+import { checkTimeAvailability } from "../lib/database";
 import { getDayOfWeek, getDayName } from "./DateHelper";
 import './modal.css';
 
@@ -100,17 +101,6 @@ export default function Agendamento() {
     return () => clearTimeout(timer); // Limpa o timer se o componente for desmontado
   }, [name]);
 
-  // Função para verificar se um horário já está agendado
-  const checkTimeAvailability = async (selectedDate, selectedTime) => {
-    try {
-      // Importa a função de verificação de disponibilidade
-      const { checkTimeAvailability } = await import('../lib/database');
-      return await checkTimeAvailability(selectedDate, selectedTime);
-    } catch (error) {
-      console.error('Erro ao verificar disponibilidade:', error);
-      return false;
-    }
-  };
 
   // Função para verificar horários consecutivos para serviços de 1 hora
   const findConsecutiveSlots = (timeSlots, bookedTimes) => {
